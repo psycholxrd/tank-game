@@ -43,15 +43,14 @@ class Player {
 
 class Apple {
   constructor(x, y, rFactor = 0.1, unit='u') {
-    this.unit = 'u';
+    this.unit = unit;
     this.r = 1;
     this.rFactor = rFactor;
     this.raw = {
       x: x,
       y: y,
     };
-    this.x = x * u;
-    this.y = y * u;
+    this.x, this.y;
     this.color = "red";
   }
   update_values() {

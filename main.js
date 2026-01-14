@@ -4,6 +4,7 @@ const level_selector_cont = document.getElementById("level-selector-container");
 const level_editor_cont = document.getElementById("level-editor-container");
 const game_cont = document.getElementById('game-container');
 const highscore_text = document.getElementById("highscore");
+const entity_panel = document.getElementById("entity-panel");
 const clock = new Clock();
 const freezeClock = new FreezeClock(freezing_time);
 const respawn_point = {
@@ -600,7 +601,7 @@ const screen_displays = {
   'menu': 'flex',
   'game': 'block',
   'level-selector': 'flex',
-  'level-editor': 'block',
+  'level-editor': 'flex',
   'game-completed': 'block' 
 }
 const screen_containers = {
@@ -664,6 +665,11 @@ c2.canvas.addEventListener('mousemove', (e) => {
   editor_canvas_mouse = getMousePos(c2.canvas, e);
 })
 
+let circle_units = {
+  x: undefined,
+  y: undefined,
+}
+
 function draw_pos_circles(){
   /*
   c2.begin();
@@ -676,6 +682,7 @@ function draw_pos_circles(){
   let r = u2/10;
   let snippet_a = c2.canvas.width / a;
   let snippet_b = c2.canvas.height / b;
+  let temp_x, temp_y;
   for (let i = 0; i < a; i++) {
     for (let j = 0; j < b; j++) {
       const x = i*snippet_a;
@@ -685,6 +692,8 @@ function draw_pos_circles(){
       c2.set_property('globalAlpha', 0.2);
       if(d < r){
         c2.set_property('fillStyle', 'green')
+        temp_x = i;
+        temp_y = j;
       }else{
         c2.set_property('fillStyle', 'red');
       }
@@ -693,7 +702,11 @@ function draw_pos_circles(){
       c2.set_property('globalAlpha', 1);
     }
   }
+  circle_units.x = temp_x;
+  circle_units.y = temp_y;
 }
+
+let last_editor_type, last_editor_entity;
 
 function drawEditorEnemies(_enemies){
   for(let enemy of _enemies){
@@ -727,7 +740,13 @@ function drawEditorEnemies(_enemies){
   }
 }
 
-let editor_level;
+let editor_level = {enemies: [], apples: []}; //default
+let u3 = 1;
+let entity_default_canvases = {
+  slaves: [],
+  bosses: [],
+  apples: [],
+};
 function update_editor_canvas(){
   c2.clear();
   drawEditorEnemies(editor_level.enemies);
@@ -736,8 +755,114 @@ function update_editor_canvas(){
   window.requestAnimationFrame(update_editor_canvas);
 }
 
+let dragPreview = null;
+
+function start_entity_drag(entity_type, name, e) {
+  // Create clone canvas (not appended to panel)
+  const cloneCanvasWrapper = new_entity_canvas(entity_type, name, true);
+  const cloneCanvas = cloneCanvasWrapper.canvas; 
+  // assuming your Canvas class stores .canvas reference
+
+  cloneCanvas.classList.add('entity-drag-preview');
+  document.body.appendChild(cloneCanvas);
+
+  dragPreview = cloneCanvas;
+
+  move_drag_preview(e);
+
+  window.addEventListener('mousemove', move_drag_preview);
+  window.addEventListener('mouseup', end_entity_drag);
+}
+
+function move_drag_preview(e) {
+  if (!dragPreview) return;
+  dragPreview.style.left = e.clientX + 'px';
+  dragPreview.style.top  = e.clientY + 'px';
+}
+
+function end_entity_drag() {
+  if (!dragPreview) return;
+  dragPreview.remove();
+  dragPreview = null;
+  //apple syntax: [x, y, r] enemy syntax: [x, y, side length on grid 16x9, boss or slave, type]
+  if(circle_units.x !== undefined && circle_units.y !== undefined){
+    if(last_editor_type === 'apple'){
+      editor_level.apples.push([circle_units.x, circle_units.y, 0.1]);
+    }else{
+      editor_level.enemies.push([circle_units.x, circle_units.y, 0.5, last_editor_type, last_editor_entity]);
+    }
+  }
+
+  window.removeEventListener('mousemove', move_drag_preview);
+  window.removeEventListener('mouseup', end_entity_drag);
+}
+
+
+function new_entity_canvas(entity_type, name, clone = false){
+  let _canvas = document.createElement('canvas');
+  _canvas.width = 256;
+  _canvas.height = 256;
+  _canvas.classList.add('entity-canvas');
+  let _ctx = _canvas.getContext('2d');
+  let _c = new Canvas(_canvas, _ctx);
+  if(!clone){
+    _canvas.addEventListener('mousedown', (e) => {
+      console.log(entity_type, name);
+      last_editor_type = entity_type;
+      last_editor_entity = name;
+      start_entity_drag(entity_type, name, e);
+    })
+    entity_panel.appendChild(_canvas);
+  }
+  if(entity_type === 'apple'){
+    let _apple = new Apple(_canvas.width/2, _canvas.width/2, 75, '');
+    _apple.update_values();
+    _c.begin();
+    _c.set_property("fillStyle", _apple.color);
+    _c.arc(_apple.x, _apple.y, _apple.r, 0, 2 * Math.PI);
+    _c.fill();
+    console.log(_apple);
+    return _c;
+  }
+  const sF = 5;
+  let _enemy = new Enemy(_canvas.width/sF, _canvas.width/sF, _canvas.width-(_canvas.width/(sF/2)), _canvas.width-(_canvas.width/(sF/2)), name, '');
+  switch (entity_type) {
+      case "slave":
+        _enemy.is_Slave = true;
+        _enemy.is_Boss = false;
+        break;
+      case "boss":
+        _enemy.is_Slave = false;
+        _enemy.is_Boss = true;
+        break;
+    }
+  _enemy.update_values();
+  console.log(_enemy.type, skin_colors[_enemy.type]);
+  _enemy.damage_active
+      ? null
+      : (_enemy.enemyColor = skin_colors[_enemy.type].body);
+  _c.begin();
+  _c.set_property("fillStyle", _enemy.enemyColor);
+  _c.fillRect(_enemy.x, _enemy.y, _enemy.w, _enemy.h);
+  draw_enemy_skin(_enemy, _c);
+  return _c;
+}
+
+function create_entity_default_canvases(){
+  const e = entity_default_canvases;
+  for(let i = 0; i < slave_types.length; i++){
+    e.slaves.push(new_entity_canvas('slave', slave_types[i]));
+  }
+  for(let i = 0; i < boss_types.length; i++){
+    e.bosses.push(new_entity_canvas('boss', boss_types[i]));
+  }
+  //there is only 1 type of apples so...
+  entity_default_canvases.apples.push(new_entity_canvas('apple', 'apple'));
+}
+
 function open_level(key){
   editor_level = levels[key];
+  create_entity_default_canvases();
   change_screen('level-editor');
   draw_grid(debug.grid.a, debug.grid.b, c2, true, false);
   window.requestAnimationFrame(update_editor_canvas);

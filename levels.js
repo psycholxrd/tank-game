@@ -9,7 +9,7 @@ let enemies = [];
 let projectiles = [];
 let proj_timers = [];
 let levels = {
-  //apple syntax: [x, y] enemy syntax: [x, y, side length on grid 16x9, boss or slave, type]
+  //apple syntax: [x, y, radius] enemy syntax: [x, y, side length on grid 16x9, boss or slave, type]
   1: {
     apples: [
       [2, 1, 0.2],
