@@ -1,4 +1,5 @@
 let u = 1; //make unit globally accessable
+let u2 = 1;
 
 class global_props {
   constructor() {
@@ -87,3 +88,12 @@ class Canvas {
 }
 
 const c = new Canvas(pigeon.el, pigeon.get_ctx());
+let editor_canvas = document.getElementById("level-editor-canvas");
+function resizeEditorCanvas(){
+  u2 = (Math.min(window.innerWidth / 16, window.innerHeight / 9) * 0.99)/1.5;
+  editor_canvas.width = u2*16;
+  editor_canvas.height = u2*9;
+}
+resizeEditorCanvas();
+window.addEventListener("resize", resizeEditorCanvas);
+const c2 = new Canvas(editor_canvas, editor_canvas.getContext('2d'));

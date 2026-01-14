@@ -79,7 +79,7 @@ let skin_colors = {
   },
 };
 
-function draw_enemy_skin(Enemy) {
+function draw_enemy_skin(Enemy, _c = c) {
   //console.log("argument passed: ", Enemy);
   if (Enemy.is_Boss) {
     //console.log("is Boss is true!");
@@ -90,120 +90,120 @@ function draw_enemy_skin(Enemy) {
           ? null
           : (Enemy.enemyColor = skin_colors[Enemy.type].body);
         //left eye
-        c.begin();
-        c.set_property("fillStyle", skin_colors[Enemy.type].left_eye);
-        c.moveTo(Enemy.x + Enemy.w / 8, Enemy.y + Enemy.h / 2);
-        c.lineTo(Enemy.x + Enemy.w / 8, Enemy.y + Enemy.h / 4);
-        c.lineTo(Enemy.x + (Enemy.w / 8) * 3, Enemy.y + Enemy.h / 2);
-        c.fill();
+        _c.begin();
+        _c.set_property("fillStyle", skin_colors[Enemy.type].left_eye);
+        _c.moveTo(Enemy.x + Enemy.w / 8, Enemy.y + Enemy.h / 2);
+        _c.lineTo(Enemy.x + Enemy.w / 8, Enemy.y + Enemy.h / 4);
+        _c.lineTo(Enemy.x + (Enemy.w / 8) * 3, Enemy.y + Enemy.h / 2);
+        _c.fill();
 
         //right eye
-        c.begin();
-        c.set_property("fillStyle", skin_colors[Enemy.type].right_eye_eye);
-        c.moveTo(Enemy.x + (Enemy.w / 8) * 5, Enemy.y + Enemy.h / 2);
-        c.lineTo(Enemy.x + (Enemy.w / 8) * 7, Enemy.y + Enemy.h / 4);
-        c.lineTo(Enemy.x + (Enemy.w / 8) * 7, Enemy.y + Enemy.h / 2);
-        c.fill();
+        _c.begin();
+        _c.set_property("fillStyle", skin_colors[Enemy.type].right_eye_eye);
+        _c.moveTo(Enemy.x + (Enemy.w / 8) * 5, Enemy.y + Enemy.h / 2);
+        _c.lineTo(Enemy.x + (Enemy.w / 8) * 7, Enemy.y + Enemy.h / 4);
+        _c.lineTo(Enemy.x + (Enemy.w / 8) * 7, Enemy.y + Enemy.h / 2);
+        _c.fill();
 
         //beard
 
         //top light blue half circle
-        c.begin();
-        c.set_property("fillStyle", skin_colors[Enemy.type].upper_beard);
-        c.arc(
+        _c.begin();
+        _c.set_property("fillStyle", skin_colors[Enemy.type].upper_beard);
+        _c.arc(
           Enemy.x + Enemy.w / 2,
           Enemy.y + Enemy.h,
           Enemy.w / 3,
           1 * Math.PI,
           0
         );
-        c.fill();
+        _c.fill();
         //inner white circle
-        c.begin();
-        c.set_property("fillStyle", skin_colors[Enemy.type].mouth);
-        c.arc(
+        _c.begin();
+        _c.set_property("fillStyle", skin_colors[Enemy.type].mouth);
+        _c.arc(
           Enemy.x + Enemy.w / 2,
           Enemy.y + (Enemy.h / 8) * 7,
           Enemy.w / 10,
           0,
           2 * Math.PI
         );
-        c.fill();
+        _c.fill();
         //bottom part of the beard
-        c.begin();
-        c.set_property("fillStyle", skin_colors[Enemy.type].bottom_beard);
-        c.moveTo(Enemy.x + Enemy.w / 2 - Enemy.w / 3, Enemy.y + Enemy.h);
-        c.lineTo(Enemy.x + Enemy.w / 2 + Enemy.w / 3, Enemy.y + Enemy.h);
-        c.lineTo(Enemy.x + Enemy.w / 2 + Enemy.w / 3, Enemy.y + Enemy.h * 1.5);
-        c.lineTo(Enemy.x + Enemy.w / 2 + Enemy.w / 6, Enemy.y + Enemy.h * 1.25);
-        c.lineTo(Enemy.x + Enemy.w / 2, Enemy.y + Enemy.h * 1.5);
-        c.lineTo(Enemy.x + Enemy.w / 2 - Enemy.w / 6, Enemy.y + Enemy.h * 1.25);
-        c.lineTo(Enemy.x + Enemy.w / 2 - Enemy.w / 3, Enemy.y + Enemy.h * 1.5);
-        c.lineTo(Enemy.x + Enemy.w / 2 - Enemy.w / 3, Enemy.y + Enemy.h); //last line
-        c.fill();
+        _c.begin();
+        _c.set_property("fillStyle", skin_colors[Enemy.type].bottom_beard);
+        _c.moveTo(Enemy.x + Enemy.w / 2 - Enemy.w / 3, Enemy.y + Enemy.h);
+        _c.lineTo(Enemy.x + Enemy.w / 2 + Enemy.w / 3, Enemy.y + Enemy.h);
+        _c.lineTo(Enemy.x + Enemy.w / 2 + Enemy.w / 3, Enemy.y + Enemy.h * 1.5);
+        _c.lineTo(Enemy.x + Enemy.w / 2 + Enemy.w / 6, Enemy.y + Enemy.h * 1.25);
+        _c.lineTo(Enemy.x + Enemy.w / 2, Enemy.y + Enemy.h * 1.5);
+        _c.lineTo(Enemy.x + Enemy.w / 2 - Enemy.w / 6, Enemy.y + Enemy.h * 1.25);
+        _c.lineTo(Enemy.x + Enemy.w / 2 - Enemy.w / 3, Enemy.y + Enemy.h * 1.5);
+        _c.lineTo(Enemy.x + Enemy.w / 2 - Enemy.w / 3, Enemy.y + Enemy.h); //last line
+        _c.fill();
         break;
       case boss_types[1]:
         Enemy.damage_active
           ? null
           : (Enemy.enemyColor = skin_colors[Enemy.type].body);
         //left eyebrow
-        c.begin();
-        c.set_property("strokeStyle", skin_colors[Enemy.type].left_eyebrow);
-        c.moveTo(Enemy.x + Enemy.w / 8, Enemy.y + (Enemy.h / 8) * 3);
-        c.lineTo(Enemy.x + (Enemy.w / 8) * 3, Enemy.y + Enemy.h / 4);
-        c.stroke();
+        _c.begin();
+        _c.set_property("strokeStyle", skin_colors[Enemy.type].left_eyebrow);
+        _c.moveTo(Enemy.x + Enemy.w / 8, Enemy.y + (Enemy.h / 8) * 3);
+        _c.lineTo(Enemy.x + (Enemy.w / 8) * 3, Enemy.y + Enemy.h / 4);
+        _c.stroke();
         //left closed eye
-        c.begin();
-        c.set_property("strokeStyle", skin_colors[Enemy.type].left_eye);
-        c.arc(
+        _c.begin();
+        _c.set_property("strokeStyle", skin_colors[Enemy.type].left_eye);
+        _c.arc(
           Enemy.x + Enemy.w / 4,
           Enemy.y + (Enemy.h / 16) * 8,
           (Enemy.w / 16) * 3,
           0,
           1 * Math.PI
         );
-        c.stroke();
+        _c.stroke();
         //right eyebrow
-        c.begin();
-        c.set_property("strokeStyle", skin_colors[Enemy.type].right_eyebrow);
-        c.moveTo(Enemy.x + (Enemy.w / 8) * 5, Enemy.y + Enemy.h / 4);
-        c.lineTo(Enemy.x + (Enemy.w / 8) * 7, Enemy.y + (Enemy.h / 8) * 3);
-        c.stroke();
+        _c.begin();
+        _c.set_property("strokeStyle", skin_colors[Enemy.type].right_eyebrow);
+        _c.moveTo(Enemy.x + (Enemy.w / 8) * 5, Enemy.y + Enemy.h / 4);
+        _c.lineTo(Enemy.x + (Enemy.w / 8) * 7, Enemy.y + (Enemy.h / 8) * 3);
+        _c.stroke();
         //right closed eye
-        c.begin();
-        c.set_property("strokeStyle", skin_colors[Enemy.type].right_eye);
-        c.arc(
+        _c.begin();
+        _c.set_property("strokeStyle", skin_colors[Enemy.type].right_eye);
+        _c.arc(
           Enemy.x + (Enemy.w / 4) * 3,
           Enemy.y + (Enemy.h / 16) * 8,
           (Enemy.w / 16) * 3,
           0,
           1 * Math.PI
         );
-        c.stroke();
+        _c.stroke();
         //mouth
-        c.begin();
-        c.set_property("strokeStyle", skin_colors[Enemy.type].mouth);
-        c.arc(
+        _c.begin();
+        _c.set_property("strokeStyle", skin_colors[Enemy.type].mouth);
+        _c.arc(
           Enemy.x + Enemy.w / 2,
           Enemy.y + (Enemy.h / 8) * 7,
           Enemy.w / 16,
           1 * Math.PI,
           0
         );
-        c.stroke();
+        _c.stroke();
         //left leg
-        c.begin();
-        c.set_property("fillStyle", Enemy.enemyColor);
-        c.fillRect(
+        _c.begin();
+        _c.set_property("fillStyle", Enemy.enemyColor);
+        _c.fillRect(
           Enemy.x + Enemy.w / 8,
           Enemy.y + Enemy.h,
           Enemy.w / 8,
           Enemy.h / 4
         );
         //right legt
-        c.begin();
-        c.set_property("fillStyle", Enemy.enemyColor);
-        c.fillRect(
+        _c.begin();
+        _c.set_property("fillStyle", Enemy.enemyColor);
+        _c.fillRect(
           Enemy.x + (Enemy.w / 8) * 6,
           Enemy.y + Enemy.h,
           Enemy.w / 8,
@@ -215,70 +215,70 @@ function draw_enemy_skin(Enemy) {
           ? null
           : (Enemy.enemyColor = skin_colors[Enemy.type].body);
         //White eye
-        c.begin();
-        c.set_property("fillStyle", skin_colors[Enemy.type].big_eye);
-        c.arc(
+        _c.begin();
+        _c.set_property("fillStyle", skin_colors[Enemy.type].big_eye);
+        _c.arc(
           Enemy.x + Enemy.w / 2,
           Enemy.y + Enemy.h / 4,
           (Enemy.w / 8) * 3,
           0,
           1 * Math.PI
         );
-        c.fill();
+        _c.fill();
         //black eye
-        c.begin();
-        c.set_property("fillStyle", skin_colors[Enemy.type].small_eye);
-        c.arc(
+        _c.begin();
+        _c.set_property("fillStyle", skin_colors[Enemy.type].small_eye);
+        _c.arc(
           Enemy.x + Enemy.w / 2,
           Enemy.y + (Enemy.h / 16) * 7,
           Enemy.w / 8,
           0,
           2 * Math.PI
         );
-        c.fill();
+        _c.fill();
         //belt (big)
-        c.begin();
-        c.set_property("fillStyle", skin_colors[Enemy.type].big_belt);
-        c.fillRect(
+        _c.begin();
+        _c.set_property("fillStyle", skin_colors[Enemy.type].big_belt);
+        _c.fillRect(
           Enemy.x - Enemy.w / 12,
           Enemy.y + Enemy.h,
           Enemy.w / 6,
           Enemy.h / 4
         );
-        c.fillRect(
+        _c.fillRect(
           Enemy.x + Enemy.w / 3 - Enemy.w / 12,
           Enemy.y + Enemy.h,
           Enemy.w / 6,
           Enemy.h / 4
         );
-        c.fillRect(
+        _c.fillRect(
           Enemy.x + (Enemy.w / 3) * 2 - Enemy.w / 12,
           Enemy.y + Enemy.h,
           Enemy.w / 6,
           Enemy.h / 4
         );
-        c.fillRect(
+        _c.fillRect(
           Enemy.x + Enemy.w - Enemy.w / 12,
           Enemy.y + Enemy.h,
           Enemy.w / 6,
           Enemy.h / 4
         );
         //belt (small)
-        c.begin();
-        c.set_property("fillStyle", skin_colors[Enemy.type].small_belt);
-        c.fillRect(
+        _c.begin();
+        _c.set_property("fillStyle", skin_colors[Enemy.type].small_belt);
+        _c.fillRect(
           Enemy.x + Enemy.w / 12,
           Enemy.y + Enemy.h,
           Enemy.w / 6,
           Enemy.h / 6
         );
-        c.fillRect(
+        _c.fillRect(
           Enemy.x + Enemy.w / 3 + Enemy.w / 12,
           Enemy.y + Enemy.h,
           Enemy.w / 6,
           Enemy.h / 6
         );
-        c.fillRect(
+        _c.fillRect(
           Enemy.x + (Enemy.w / 3) * 2 + Enemy.w / 12,
           Enemy.y + Enemy.h,
           Enemy.w / 6,
@@ -295,92 +295,92 @@ function draw_enemy_skin(Enemy) {
           ? null
           : (Enemy.enemyColor = skin_colors[Enemy.type].body);
         //left eye
-        c.begin();
-        c.set_property("strokeStyle", skin_colors[Enemy.type].left_eye);
-        c.moveTo(Enemy.x + Enemy.w / 8, Enemy.y + Enemy.h / 2);
-        c.lineTo(Enemy.x + Enemy.w / 4, Enemy.y + Enemy.h / 4);
-        c.lineTo(Enemy.x + (Enemy.w / 8) * 3, Enemy.y + Enemy.h / 2);
-        c.stroke();
+        _c.begin();
+        _c.set_property("strokeStyle", skin_colors[Enemy.type].left_eye);
+        _c.moveTo(Enemy.x + Enemy.w / 8, Enemy.y + Enemy.h / 2);
+        _c.lineTo(Enemy.x + Enemy.w / 4, Enemy.y + Enemy.h / 4);
+        _c.lineTo(Enemy.x + (Enemy.w / 8) * 3, Enemy.y + Enemy.h / 2);
+        _c.stroke();
 
         //right eye
-        c.begin();
-        c.set_property("strokeStyle", skin_colors[Enemy.type].right_eye);
-        c.moveTo(Enemy.x + (Enemy.w / 8) * 5, Enemy.y + Enemy.h / 2);
-        c.lineTo(Enemy.x + (Enemy.w / 4) * 3, Enemy.y + Enemy.h / 4);
-        c.lineTo(Enemy.x + (Enemy.w / 8) * 7, Enemy.y + Enemy.h / 2);
-        c.stroke();
+        _c.begin();
+        _c.set_property("strokeStyle", skin_colors[Enemy.type].right_eye);
+        _c.moveTo(Enemy.x + (Enemy.w / 8) * 5, Enemy.y + Enemy.h / 2);
+        _c.lineTo(Enemy.x + (Enemy.w / 4) * 3, Enemy.y + Enemy.h / 4);
+        _c.lineTo(Enemy.x + (Enemy.w / 8) * 7, Enemy.y + Enemy.h / 2);
+        _c.stroke();
         break;
       case slave_types[1]:
         Enemy.damage_active
           ? null
           : (Enemy.enemyColor = skin_colors[Enemy.type].body);
         //left tear
-        c.begin();
-        c.set_property("fillStyle", skin_colors[Enemy.type].left_tear);
-        c.fillRect(
+        _c.begin();
+        _c.set_property("fillStyle", skin_colors[Enemy.type].left_tear);
+        _c.fillRect(
           Enemy.x + Enemy.w / 8,
           Enemy.y + Enemy.h / 4,
           Enemy.w / 4,
           (Enemy.h / 4) * 3
         );
         //left eye
-        c.begin();
-        c.set_property("fillStyle", skin_colors[Enemy.type].left_eye);
-        c.arc(
+        _c.begin();
+        _c.set_property("fillStyle", skin_colors[Enemy.type].left_eye);
+        _c.arc(
           Enemy.x + Enemy.w / 4,
           Enemy.y + Enemy.h / 4,
           Enemy.w / 8,
           0,
           2 * Math.PI
         );
-        c.fill();
+        _c.fill();
         //right tear
-        c.begin();
-        c.set_property("fillStyle", skin_colors[Enemy.type].right_tear);
-        c.fillRect(
+        _c.begin();
+        _c.set_property("fillStyle", skin_colors[Enemy.type].right_tear);
+        _c.fillRect(
           Enemy.x + (Enemy.w / 8) * 5,
           Enemy.y + Enemy.h / 4,
           Enemy.w / 4,
           (Enemy.h / 4) * 3
         );
         //right eye
-        c.begin();
-        c.set_property("fillStyle", skin_colors[Enemy.type].right_eye);
-        c.arc(
+        _c.begin();
+        _c.set_property("fillStyle", skin_colors[Enemy.type].right_eye);
+        _c.arc(
           Enemy.x + (Enemy.w / 4) * 3,
           Enemy.y + Enemy.h / 4,
           Enemy.w / 8,
           0,
           2 * Math.PI
         );
-        c.fill();
+        _c.fill();
         break;
       case slave_types[2]:
         Enemy.damage_active
           ? null
           : (Enemy.enemyColor = skin_colors[Enemy.type].body);
         //white eye
-        c.begin();
-        c.set_property("fillStyle", skin_colors[Enemy.type].big_eye);
-        c.arc(
+        _c.begin();
+        _c.set_property("fillStyle", skin_colors[Enemy.type].big_eye);
+        _c.arc(
           Enemy.x + Enemy.w / 2,
           Enemy.y + Enemy.h / 2,
           Enemy.w / 4,
           0,
           2 * Math.PI
         );
-        c.fill();
+        _c.fill();
         //black eye
-        c.begin();
-        c.set_property("fillStyle", skin_colors[Enemy.type].small_eye);
-        c.arc(
+        _c.begin();
+        _c.set_property("fillStyle", skin_colors[Enemy.type].small_eye);
+        _c.arc(
           Enemy.x + Enemy.w / 2,
           Enemy.y + Enemy.h / 2,
           Enemy.w / 8,
           0,
           2 * Math.PI
         );
-        c.fill();
+        _c.fill();
         break;
     }
   }

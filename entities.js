@@ -42,7 +42,8 @@ class Player {
 }
 
 class Apple {
-  constructor(x, y, rFactor = 0.1) {
+  constructor(x, y, rFactor = 0.1, unit='u') {
+    this.unit = 'u';
     this.r = 1;
     this.rFactor = rFactor;
     this.raw = {
@@ -54,14 +55,16 @@ class Apple {
     this.color = "red";
   }
   update_values() {
-    this.r = this.rFactor * u;
-    this.x = this.raw.x * u;
-    this.y = this.raw.y * u;
+    let unit = this.unit === 'u' ? u : this.unit === 'u2' ? u2 : 1;
+    this.r = this.rFactor * unit;
+    this.x = this.raw.x * unit;
+    this.y = this.raw.y * unit;
   }
 }
 
 class Enemy {
-  constructor(x, y, w, h, type = "Crier") {
+  constructor(x, y, w, h, type = "Crier", unit = 'u') {
+    this.unit = unit;
     this.p_ctxs = [];
     this.hp = (w + h) * 100;
     this.enemyColor = "SlateBlue";
@@ -140,10 +143,11 @@ class Enemy {
     }
   }
   update_values() {
-    this.x = this.raw.x * u;
-    this.y = this.raw.y * u;
-    this.w = this.raw.w * u;
-    this.h = this.raw.h * u;
+    let unit = this.unit === 'u' ? u : this.unit === 'u2' ? u2 : 1;
+    this.x = this.raw.x * unit;
+    this.y = this.raw.y * unit;
+    this.w = this.raw.w * unit;
+    this.h = this.raw.h * unit;
     this.corners = {
       lu: {
         x: this.x,

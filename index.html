@@ -12,7 +12,7 @@
         <b class = "menu-text">Tanks Game (by r!PsAw)</b>
         <div class = "menu-btn" id = "Start-btn" onclick = start_game()>Start</div>
         <div class = "menu-btn" id = "Difficulty-btn" onclick = open_difficulties()>Change Difficulty</div>
-        <div class = "menu-btn" id = "Level-Editor-btn" onclick = open_level_editor()>Level Editor</div>
+        <div class = "menu-btn" id = "Level-Editor-btn" onclick = open_level_selector()>Level Editor</div>
         <b class = "menu-text" id = "highscore">Best Time: -</b>
       </div>
       <div id = "game-container">
@@ -21,6 +21,10 @@
       </div>
       <div id = "level-selector-container">
         <b class = "level-selector-text">Select a level, you want to edit:</b>
+      </div>
+      <div id = "level-editor-container">
+        <div id = "entity-panel"></div>
+        <canvas id = "level-editor-canvas"></canvas>
       </div>
     </div>
   </body>

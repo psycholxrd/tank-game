@@ -38,6 +38,52 @@ body {
   height: 100vh;
 }
 
+#level-editor-container {
+  position: relative;
+  display: none; /*flex*/
+  top: 10%;
+  left: 10%;
+  width: 80%;
+  height: 80%;
+  background-color: white;
+  flex-direction: column;
+  /*justify-content: center;*/
+  align-items: center;
+  border: 15px solid black;
+  border-radius: 15px;
+  overflow-y: auto;    /* vertical scrollbar appears when needed */
+  overflow-x: hidden;  /* prevents horizontal scroll */
+}
+
+.level-editor-btn {
+  position: relative;
+  display: flex;
+  width: 50%;
+  height: 12.5%;
+  margin: 1%;
+  background-color: black;
+  color: white;
+  font-size: 3vh;
+  justify-content: center;
+  align-items: center;
+  border: 8px solid darkorange;
+  border-radius: 15px;
+}
+
+.level-editor-text {
+  font-size: 2vh;
+}
+
+.level-editor-btn:hover {
+  background-color: darkgray;
+  cursor: pointer;
+}
+
+#level-editor-canvas {
+  display: block;
+  background-color: lightgray;
+}
+
 #level-selector-container {
   position: relative;
   display: none; /*flex*/

@@ -1,6 +1,7 @@
 const timer = document.getElementById("timer");
 const menu_cont = document.getElementById("menu-container");
-const level_editor_cont = document.getElementById("level-selector-container");
+const level_selector_cont = document.getElementById("level-selector-container");
+const level_editor_cont = document.getElementById("level-editor-container");
 const game_cont = document.getElementById('game-container');
 const highscore_text = document.getElementById("highscore");
 const clock = new Clock();
@@ -17,6 +18,10 @@ let debug = {
     b: 9,
   },
 };
+
+function getDist(x1, y1, x2, y2){
+  return Math.hypot(x2-x1, y2-y1);
+}
 
 function msToTime(ms){
   const minutes = Math.floor(ms / 60000);
@@ -167,28 +172,31 @@ function draw_game() {
 }
 window.requestAnimationFrame(draw_game);
 
-function draw_grid(a, b) {
-  if (!debug.grid.active) return;
-  c.begin();
-  c.set_property("strokeStyle", "pink");
-  let snippet_a = canvas.width / a;
-  let snippet_b = canvas.height / b;
+function draw_grid(a, b, _c = c, lines = true, text = true) {
+  if (_c == c && !debug.grid.active) return;
+  _c.begin();
+  _c.set_property("strokeStyle", "darkblue");
+  let snippet_a = _c.canvas.width / a;
+  let snippet_b = _c.canvas.height / b;
   for (let i = 0; i < a; i++) {
-    c.moveTo(snippet_a * i, 0);
-    c.lineTo(snippet_a * i, canvas.height);
-    c.stroke();
+    if(!lines) break;
+    _c.moveTo(snippet_a * i, 0);
+    _c.lineTo(snippet_a * i, _c.canvas.height);
+    _c.stroke();
   }
   for (let i = 0; i < b; i++) {
-    c.moveTo(0, snippet_b * i);
-    c.lineTo(canvas.width, snippet_b * i);
-    c.stroke();
+    if(!lines) break;
+    _c.moveTo(0, snippet_b * i);
+    _c.lineTo(_c.canvas.width, snippet_b * i);
+    _c.stroke();
   }
   for (let i = 0; i < a; i++) {
+    if(!text) break;
     for (let j = 0; j < b; j++) {
-      c.begin();
-      c.set_property("lineWidth", 0.5);
-      c.set_property("strokeStyle", "black");
-      c.strokeText(`a: ${i} b: ${j}`, snippet_a * i, snippet_b * j, 0.1);
+      _c.begin();
+      _c.set_property("lineWidth", 0.5);
+      _c.set_property("strokeStyle", "black");
+      _c.strokeText(`a: ${i} b: ${j}`, snippet_a * i, snippet_b * j, 0.1);
     }
   }
 }
@@ -598,8 +606,8 @@ const screen_displays = {
 const screen_containers = {
   'menu': menu_cont,
   'game': game_cont,
-  'level-selector': level_editor_cont,
-  'level-editor': {},
+  'level-selector': level_selector_cont,
+  'level-editor': level_editor_cont,
   'game-completed': {},
 };
 
@@ -636,14 +644,103 @@ function open_difficulties(){
   alert("Coming soon...");
 }
 
-function open_level_editor(){
-  //alert("Coming soon...");
+function open_level_selector(){
   change_screen('level-selector');
+}
+let editor_canvas_mouse = {
+  x: 0,
+  y: 0,
+}
+
+function getMousePos(canvas, evt) {
+  const rect = canvas.getBoundingClientRect();
+  return {
+    x: evt.clientX - rect.left,
+    y: evt.clientY - rect.top
+  };
+}
+
+c2.canvas.addEventListener('mousemove', (e) => {
+  editor_canvas_mouse = getMousePos(c2.canvas, e);
+})
+
+function draw_pos_circles(){
+  /*
+  c2.begin();
+  c2.set_property('fillStyle', 'yellow');
+  c2.arc(editor_canvas_mouse.x, editor_canvas_mouse.y, u2/10, 0, 2*Math.PI, false);
+  c2.fill();
+  */
+  let a = debug.grid.a;
+  let b = debug.grid.b;
+  let r = u2/10;
+  let snippet_a = c2.canvas.width / a;
+  let snippet_b = c2.canvas.height / b;
+  for (let i = 0; i < a; i++) {
+    for (let j = 0; j < b; j++) {
+      const x = i*snippet_a;
+      const y = j*snippet_b;
+      const d = getDist(x, y, editor_canvas_mouse.x, editor_canvas_mouse.y);
+      c2.begin();
+      c2.set_property('globalAlpha', 0.2);
+      if(d < r){
+        c2.set_property('fillStyle', 'green')
+      }else{
+        c2.set_property('fillStyle', 'red');
+      }
+      c2.arc(x, y, r, 0, 2*Math.PI, false);
+      c2.fill();
+      c2.set_property('globalAlpha', 1);
+    }
+  }
+}
+
+function drawEditorEnemies(_enemies){
+  for(let enemy of _enemies){
+    let _enemy = new Enemy(
+      enemy[0],
+      enemy[1],
+      enemy[2],
+      enemy[2],
+      enemy[4],
+      'u2'
+    );
+    switch (enemy[3]) {
+      case "slave":
+        _enemy.is_Slave = true;
+        _enemy.is_Boss = false;
+        break;
+      case "boss":
+        _enemy.is_Slave = false;
+        _enemy.is_Boss = true;
+        break;
+    }
+    //console.log(_enemy);
+    _enemy.update_values();
+    _enemy.damage_active
+          ? null
+          : (_enemy.enemyColor = skin_colors[_enemy.type].body);
+    c2.begin();
+    c2.set_property("fillStyle", _enemy.enemyColor);
+    c2.fillRect(_enemy.x, _enemy.y, _enemy.w, _enemy.h);
+    draw_enemy_skin(_enemy, c2);
+  }
+}
+
+let editor_level;
+function update_editor_canvas(){
+  c2.clear();
+  drawEditorEnemies(editor_level.enemies);
+  draw_grid(debug.grid.a, debug.grid.b, c2, true, false);
+  draw_pos_circles();
+  window.requestAnimationFrame(update_editor_canvas);
 }
 
 function open_level(key){
-  alert('opened level: ' + key);
-  //change_screen('level-editor');
+  editor_level = levels[key];
+  change_screen('level-editor');
+  draw_grid(debug.grid.a, debug.grid.b, c2, true, false);
+  window.requestAnimationFrame(update_editor_canvas);
 }
 
 function loadLevelButtons(){
@@ -655,7 +752,7 @@ function loadLevelButtons(){
     btn.addEventListener("mousedown", (e) => {
       open_level(key);
     });
-    level_editor_cont.appendChild(btn);
+    level_selector_cont.appendChild(btn);
   }
   let btn = document.createElement('div');
   btn.innerHTML = 'return back to menu';
@@ -663,7 +760,7 @@ function loadLevelButtons(){
   btn.addEventListener("mousedown", (e) => {
     change_screen('menu');
   });
-  level_editor_cont.appendChild(btn);
+  level_selector_cont.appendChild(btn);
 }
 loadLevelButtons();
 
