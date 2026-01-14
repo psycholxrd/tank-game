@@ -1,4 +1,6 @@
-1. move directions logic to enemies
-2. finish drawing projectiles
-3. work on the freezing effect
-4. move enemy projectile timers to enemy class
+1. Implement a level editor.
+2. Simplify skin drawing process
+3. Add Pause button
+4. Add Game finished screen
+5. Add window. functions
+6. Try to add mobile support

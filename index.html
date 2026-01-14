@@ -11,10 +11,17 @@
       <div id = "menu-container">
         <b class = "menu-text">Tanks Game (by r!PsAw)</b>
         <div class = "menu-btn" id = "Start-btn" onclick = start_game()>Start</div>
-        <b class = "menu-text" id = "highscore">Highscore: -</b>
+        <div class = "menu-btn" id = "Difficulty-btn" onclick = open_difficulties()>Change Difficulty</div>
+        <div class = "menu-btn" id = "Level-Editor-btn" onclick = open_level_editor()>Level Editor</div>
+        <b class = "menu-text" id = "highscore">Best Time: -</b>
       </div>
-      <div id = "timer">00:00:00</div>
-      <canvas id="canvas"></canvas>
+      <div id = "game-container">
+        <div id = "timer">00:00:00</div>
+        <canvas id="canvas"></canvas>
+      </div>
+      <div id = "level-selector-container">
+        <b class = "level-selector-text">Select a level, you want to edit:</b>
+      </div>
     </div>
   </body>
 

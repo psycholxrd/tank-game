@@ -1,5 +1,7 @@
 const timer = document.getElementById("timer");
 const menu_cont = document.getElementById("menu-container");
+const level_editor_cont = document.getElementById("level-selector-container");
+const game_cont = document.getElementById('game-container');
 const highscore_text = document.getElementById("highscore");
 const clock = new Clock();
 const freezeClock = new FreezeClock(freezing_time);
@@ -30,7 +32,7 @@ function msToTime(ms){
 function updateHighscoreText(){
   let last_best = localStorage.getItem('[Tanks] BestTime');
   let suffix = !!last_best ? msToTime(JSON.parse(last_best)) : '-';
-  highscore_text.innerHTML = "Highscore: " + suffix;
+  highscore_text.innerHTML = "Best Time: " + suffix;
 }
 updateHighscoreText();
 
@@ -584,25 +586,39 @@ document.addEventListener("contextmenu", (e) => {
   e.preventDefault();
 });
 
-//start game
-//load_level(1);
-function switch_menu_to_game(){
-  menu_cont.style.display = 'none';
-  pigeon.el.style.display = 'block';
-  timer.style.display = 'flex';
+//screen changer
+const allowed_screens = ['menu', 'game', 'level-selector', 'level-editor', 'game-completed'];
+const screen_displays = {
+  'menu': 'flex',
+  'game': 'block',
+  'level-selector': 'flex',
+  'level-editor': 'block',
+  'game-completed': 'block' 
+}
+const screen_containers = {
+  'menu': menu_cont,
+  'game': game_cont,
+  'level-selector': level_editor_cont,
+  'level-editor': {},
+  'game-completed': {},
+};
+
+let active_screen = 'menu';
+function change_screen(new_screen){
+  if(!allowed_screens.includes(new_screen)) return console.warn(new_screen + ' is not allowed!');
+  screen_containers[active_screen].style.display = 'none';
+  screen_containers[new_screen].style.display = screen_displays[new_screen];
+  active_screen = new_screen;
 }
 
-function switch_game_to_menu(){
-  menu_cont.style.display = 'flex';
-  pigeon.el.style.display = 'none';
-  timer.style.display = 'none';
-  updateHighscoreText();
-}
+//start game
+//load_level(1);
 
 //temporary
 function handleGameFinished(){
   if(!game_active && game_completed){
-    switch_game_to_menu();
+    change_screen('menu');
+    updateHighscoreText();
     return;
   }
   window.requestAnimationFrame(handleGameFinished);
@@ -611,10 +627,45 @@ window.requestAnimationFrame(handleGameFinished);
 
 function start_game(){
   if(game_active) return;
-  switch_menu_to_game();
+  change_screen('game');
   load_level(1);
   setTimeout(start_proj_loop, 250);
 }
+
+function open_difficulties(){
+  alert("Coming soon...");
+}
+
+function open_level_editor(){
+  //alert("Coming soon...");
+  change_screen('level-selector');
+}
+
+function open_level(key){
+  alert('opened level: ' + key);
+  //change_screen('level-editor');
+}
+
+function loadLevelButtons(){
+  let keys = Object.keys(levels);
+  for(let key of keys){
+    let btn = document.createElement('div');
+    btn.innerHTML = key;
+    btn.classList.add('level-selector-btn');
+    btn.addEventListener("mousedown", (e) => {
+      open_level(key);
+    });
+    level_editor_cont.appendChild(btn);
+  }
+  let btn = document.createElement('div');
+  btn.innerHTML = 'return back to menu';
+  btn.classList.add('level-selector-btn');
+  btn.addEventListener("mousedown", (e) => {
+    change_screen('menu');
+  });
+  level_editor_cont.appendChild(btn);
+}
+loadLevelButtons();
 
 //check if dead
 function spawn_player() {
