@@ -90,7 +90,7 @@ class Canvas {
 const c = new Canvas(pigeon.el, pigeon.get_ctx());
 let editor_canvas = document.getElementById("level-editor-canvas");
 function resizeEditorCanvas(){
-  u2 = (Math.min(window.innerWidth / 16, window.innerHeight / 9) * 0.99)/1.5;
+  u2 = (Math.min(window.innerWidth / 16, window.innerHeight / 9) * 0.99)/2;
   editor_canvas.width = u2*16;
   editor_canvas.height = u2*9;
 }

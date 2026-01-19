@@ -5,6 +5,7 @@ const level_editor_cont = document.getElementById("level-editor-container");
 const game_cont = document.getElementById('game-container');
 const highscore_text = document.getElementById("highscore");
 const entity_panel = document.getElementById("entity-panel");
+const grid_slider = document.getElementById("grid-intensity");
 const clock = new Clock();
 const freezeClock = new FreezeClock(freezing_time);
 const respawn_point = {
@@ -670,31 +671,31 @@ let circle_units = {
   y: undefined,
 }
 
-function draw_pos_circles(){
-  /*
-  c2.begin();
-  c2.set_property('fillStyle', 'yellow');
-  c2.arc(editor_canvas_mouse.x, editor_canvas_mouse.y, u2/10, 0, 2*Math.PI, false);
-  c2.fill();
-  */
-  let a = debug.grid.a;
-  let b = debug.grid.b;
+function draw_pos_circles(grid_intensity){
+  let a = debug.grid.a / grid_intensity;
+  let b = debug.grid.b / grid_intensity;
   let r = u2/10;
   let snippet_a = c2.canvas.width / a;
   let snippet_b = c2.canvas.height / b;
-  let temp_x, temp_y;
+  
+  // Reset these every frame so we don't snap to old positions
+  let temp_x = undefined; 
+  let temp_y = undefined;
+
   for (let i = 0; i < a; i++) {
     for (let j = 0; j < b; j++) {
-      const x = i*snippet_a;
-      const y = j*snippet_b;
+      const x = i * snippet_a;
+      const y = j * snippet_b;
       const d = getDist(x, y, editor_canvas_mouse.x, editor_canvas_mouse.y);
+      
       c2.begin();
       c2.set_property('globalAlpha', 0.2);
+      
       if(d < r){
-        c2.set_property('fillStyle', 'green')
-        temp_x = i;
+        c2.set_property('fillStyle', 'green');
+        temp_x = i; // This is the index (0, 1, 2...)
         temp_y = j;
-      }else{
+      } else {
         c2.set_property('fillStyle', 'red');
       }
       c2.arc(x, y, r, 0, 2*Math.PI, false);
@@ -707,6 +708,17 @@ function draw_pos_circles(){
 }
 
 let last_editor_type, last_editor_entity;
+
+function drawEditorApples(_apples){
+  for(let _apple of _apples){
+    let temp_apple = new Apple(..._apple, 'u2');
+    temp_apple.update_values();
+    c2.begin();
+    c2.set_property("fillStyle", temp_apple.color);
+    c2.arc(temp_apple.x, temp_apple.y, temp_apple.r, 0, 2 * Math.PI);
+    c2.fill();
+  }
+}
 
 function drawEditorEnemies(_enemies){
   for(let enemy of _enemies){
@@ -747,11 +759,20 @@ let entity_default_canvases = {
   bosses: [],
   apples: [],
 };
+
+let grid_intensity = 1;
+
+grid_slider.addEventListener('input', (e) => {
+  grid_intensity = grid_slider.value*0.25;
+  grid_slider.innerHTML = grid_slider.value;
+})
+
 function update_editor_canvas(){
   c2.clear();
   drawEditorEnemies(editor_level.enemies);
-  draw_grid(debug.grid.a, debug.grid.b, c2, true, false);
-  draw_pos_circles();
+  drawEditorApples(editor_level.apples);
+  draw_grid(debug.grid.a / grid_intensity, debug.grid.b / grid_intensity, c2, true, false);
+  draw_pos_circles(grid_intensity);
   window.requestAnimationFrame(update_editor_canvas);
 }
 
@@ -784,12 +805,15 @@ function end_entity_drag() {
   if (!dragPreview) return;
   dragPreview.remove();
   dragPreview = null;
-  //apple syntax: [x, y, r] enemy syntax: [x, y, side length on grid 16x9, boss or slave, type]
+
   if(circle_units.x !== undefined && circle_units.y !== undefined){
+    const normalizedX = circle_units.x * grid_intensity;
+    const normalizedY = circle_units.y * grid_intensity;
+    const scale = parseInt(document.getElementById(`${last_editor_entity}-slider`).value)*0.05;
     if(last_editor_type === 'apple'){
-      editor_level.apples.push([circle_units.x, circle_units.y, 0.1]);
-    }else{
-      editor_level.enemies.push([circle_units.x, circle_units.y, 0.5, last_editor_type, last_editor_entity]);
+      editor_level.apples.push([normalizedX, normalizedY, scale]);
+    } else {
+      editor_level.enemies.push([normalizedX, normalizedY, scale, last_editor_type, last_editor_entity]);
     }
   }
 
@@ -813,6 +837,14 @@ function new_entity_canvas(entity_type, name, clone = false){
       start_entity_drag(entity_type, name, e);
     })
     entity_panel.appendChild(_canvas);
+    //slider
+    let slider = document.createElement('input');
+    slider.type = 'range';
+    slider.min = 2;
+    slider.max = 40;
+    slider.value = 10;
+    slider.id = `${name}-slider`;
+    entity_panel.appendChild(slider);
   }
   if(entity_type === 'apple'){
     let _apple = new Apple(_canvas.width/2, _canvas.width/2, 75, '');

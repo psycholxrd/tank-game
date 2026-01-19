@@ -23,10 +23,16 @@
         <b class = "level-selector-text">Select a level, you want to edit:</b>
       </div>
       <div id = "level-editor-container">
-        <div id = "entity-panel">
+        <div class = "editor-panel" id = "entity-panel">
           <b class = "level-editor-text">Select an Entity:</b>
         </div>
         <canvas id = "level-editor-canvas"></canvas>
+        <div class = "editor-panel" id = "settings-panel">
+          <b class = "level-editor-text">Settings:</b>
+          <a class = "level-editor-text">Grid Intensity</a>
+          <input type = "range" min = "1" max = "4" value = "4" id = "grid-intensity"></input>
+          <div class = "level-editor-btn" onclick = open_level_selector()>Return to Selector</div>
+        </div>
       </div>
     </div>
   </body>
