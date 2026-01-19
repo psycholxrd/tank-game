@@ -1,5 +1,7 @@
 const timer = document.getElementById("timer");
 const menu_cont = document.getElementById("menu-container");
+const difficulty_cont = document.getElementById("difficulty-container");
+const chosen_difficulty = document.getElementById("chosen-difficulty");
 const level_selector_cont = document.getElementById("level-selector-container");
 const level_editor_cont = document.getElementById("level-editor-container");
 const game_cont = document.getElementById('game-container');
@@ -597,10 +599,11 @@ document.addEventListener("contextmenu", (e) => {
 });
 
 //screen changer
-const allowed_screens = ['menu', 'game', 'level-selector', 'level-editor', 'game-completed'];
+const allowed_screens = ['menu', 'game', 'difficulty', 'level-selector', 'level-editor', 'game-completed'];
 const screen_displays = {
   'menu': 'flex',
   'game': 'block',
+  'difficulty': 'flex',
   'level-selector': 'flex',
   'level-editor': 'flex',
   'game-completed': 'block' 
@@ -608,6 +611,7 @@ const screen_displays = {
 const screen_containers = {
   'menu': menu_cont,
   'game': game_cont,
+  'difficulty': difficulty_cont,
   'level-selector': level_selector_cont,
   'level-editor': level_editor_cont,
   'game-completed': {},
@@ -643,7 +647,25 @@ function start_game(){
 }
 
 function open_difficulties(){
-  alert("Coming soon...");
+  change_screen('difficulty');
+}
+
+function setEasyDifficulty(){
+  difficulty = "easy";
+  chosen_difficulty.innerHTML = 'Difficulty: Easy';
+  change_screen('menu');
+}
+
+function setNormalDifficulty(){
+  difficulty = "normal";
+  chosen_difficulty.innerHTML = 'Difficulty: Normal';
+  change_screen('menu');
+}
+
+function setHardDifficulty(){
+  difficulty = "hard";
+  chosen_difficulty.innerHTML = 'Difficulty: Hard';
+  change_screen('menu');
 }
 
 function open_level_selector(){

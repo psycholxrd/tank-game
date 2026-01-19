@@ -164,6 +164,15 @@ body {
 
 .menu-text {
   font-size: 3vh;
+  color: yellow;
+  text-shadow: 1px 1px 3px red;
+}
+
+.menu-big-text {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 6vh;
+  color: white;
+  text-shadow: 3px 3px 6px black;
 }
 
 .menu-btn {
@@ -184,6 +193,45 @@ body {
 .menu-btn:hover {
   background-color: darkgray;
   cursor: pointer;
+}
+
+#difficulty-container {
+  position: relative;
+  display: none; /*flex*/
+  top: 10%;
+  left: 10%;
+  width: 80%;
+  height: 80%;
+  background-color: Gainsboro;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border: 15px solid black;
+  border-radius: 15px;
+}
+
+.difficulty-btn {
+  position: relative;
+  display: flex;
+  width: 50%;
+  height: 12.5%;
+  margin: 1%;
+  background-color: black;
+  color: white;
+  font-size: 3vh;
+  justify-content: center;
+  align-items: center;
+  border: 8px solid darkorange;
+  border-radius: 15px;
+}
+
+.difficulty-btn:hover {
+  background-color: darkgray;
+  cursor: pointer;
+}
+
+.difficulty-text {
+  font-size: 6vh;
 }
 
 #timer {

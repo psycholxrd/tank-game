@@ -75,6 +75,29 @@ EXPLANATION:
 - frequency how close the waves are to each other
 - amplitude how big are the waves
 */
+let difficulty = 'normal';
+
+const difficulty_modifiers = {
+  'easy': {
+    damage: 0.6,
+    cooldown: 3.5,
+    projectileSlowness: 3,
+    bounceTime: 0.55,
+  },
+  'normal': {
+    damage: 1,
+    cooldown: 1,
+    projectileSlowness: 1,
+    bounceTime: 1,
+  },
+  'hard': {
+    damage: 1.25,
+    cooldown: 0.7,
+    projectileSlowness: 0.5,
+    bounceTime: 3,
+  }
+}
+
 let stats = {
   'Ice Wizard': {
     projectile_directions: [0, 1, 1, 1, 1, 1, 1, 1, 1],
@@ -171,6 +194,7 @@ let stats = {
 
 class Enemy {
   constructor(x, y, w, h, type = "Crier", unit = 'u') {
+    let _difficulty = (difficulty in difficulty_modifiers) ? difficulty : 'normal';
     this.unit = unit;
     this.p_ctxs = [];
     this.hp = (w + h) * 100;
@@ -188,11 +212,11 @@ class Enemy {
     this.projectile_directions = stats[this.type].projectile_directions;
     this.last_direction = stats[this.type].last_direction;
     this.projectile_type = stats[this.type].projectile_type;
-    this.pdamage = stats[this.type].damage;
-    this.p_cd = stats[this.type].cooldown;
-    this.p_rscale = stats[this.type].projectileSlowness;
+    this.pdamage = stats[this.type].damage * difficulty_modifiers[_difficulty].damage;
+    this.p_cd = stats[this.type].cooldown * difficulty_modifiers[_difficulty].cooldown;
+    this.p_rscale = stats[this.type].projectileSlowness * difficulty_modifiers[_difficulty].projectileSlowness;
     this.pbouncy = stats[this.type].isBouncy;
-    this.bounceTime = stats[this.type].bounceTime;
+    this.bounceTime = stats[this.type].bounceTime * difficulty_modifiers[_difficulty].bounceTime;
     this.pwavy = stats[this.type].isWavy;
     this.pfrequency = stats[this.type].frequency;
     this.pamplitude = stats[this.type].amplitude;
