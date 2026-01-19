@@ -61,6 +61,114 @@ class Apple {
   }
 }
 
+/*
+EXPLANATION:
+- projectile_directions has 1 for allowed direction and 0 for disallowed. The index represents a direction
+- last_direction potentially useless
+- projectile_type not only determines skin, but also effect (like freezing)
+- damage just raw damage number dealt to the player when hit by projectile
+- cooldown basically shooting cooldown in milliseconds (or frames I don't remember)
+- projectileSlowness higher value makes projectiles fly slower
+- isBouncy when true, reverses the direction of the projectile when touching the border
+- bounceTime how long can a projectile live before despawning
+- isWavy when true, moves in sinus/cosinus curves
+- frequency how close the waves are to each other
+- amplitude how big are the waves
+*/
+let stats = {
+  'Ice Wizard': {
+    projectile_directions: [0, 1, 1, 1, 1, 1, 1, 1, 1],
+    last_direction: 1,
+    projectile_type: 'Freeze',
+    damage: 150,
+    cooldown: 1000,
+    projectileSlowness: 5,
+    isBouncy: false,
+    bounceTime: 0,
+    isWavy: false,
+    frequency: 0,
+    amplitude: 0,
+  },
+  'Cry Baby': {
+    projectile_directions: [0, 0, 0, 0, 1, 0, 1, 0, 0],
+    last_direction: 4,
+    projectile_type: 'BigTear',
+    damage: 175,
+    cooldown: 1750,
+    projectileSlowness: 7,
+    isBouncy: true,
+    bounceTime: 10000,
+    isWavy: false,
+    frequency: 1,
+    amplitude: 1,
+  },
+  'Mega Org': {
+    projectile_directions: [1, 0, 0, 0, 0, 0, 0, 0, 0],
+    last_direction: 0,
+    projectile_type: 'BigSnipe',
+    damage: 400,
+    cooldown: 3750,
+    projectileSlowness: 5,
+    isBouncy: false,
+    bounceTime: 0,
+    isWavy: false,
+    frequency: 1,
+    amplitude: 1,
+  },
+  'Frosty': {
+    projectile_directions: [0, 1, 0, 1, 0, 1, 0, 1, 0],
+    last_direction: 1,
+    projectile_type: 'Arrow',
+    damage: 100,
+    cooldown: 875,
+    projectileSlowness: 4,
+    isBouncy: false,
+    bounceTime: 0,
+    isWavy: false,
+    frequency: 1,
+    amplitude: 1,
+  },
+  'Crier': {
+    projectile_directions: [0, 0, 0, 0, 0, 1, 0, 0, 0],
+    last_direction: 5,
+    projectile_type: 'Tear',
+    damage: 175,
+    cooldown: 1100,
+    projectileSlowness: 2,
+    isBouncy: false,
+    bounceTime: 0,
+    isWavy: false,
+    frequency: 1,
+    amplitude: 1,
+  },
+  'Org': {
+    projectile_directions: [1, 0, 0, 0, 0, 0, 0, 0, 0],
+    last_direction: 0,
+    projectile_type: 'Snipe',
+    damage: 250,
+    cooldown: 5000,
+    projectileSlowness: 5,
+    isBouncy: false,
+    bounceTime: 0,
+    isWavy: false,
+    frequency: 1,
+    amplitude: 1,
+  },
+  'Default': {
+    projectile_directions: [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    last_direction: 0,
+    projectile_type: 'Arrow',
+    damage: 250,
+    cooldown: 1000,
+    projectileSlowness: 5,
+    isBouncy: false,
+    bounceTime: 0,
+    isWavy: false,
+    frequency: 1,
+    amplitude: 1,
+  }
+}
+
 class Enemy {
   constructor(x, y, w, h, type = "Crier", unit = 'u') {
     this.unit = unit;
@@ -70,76 +178,29 @@ class Enemy {
     this.damage_active = false;
     this.is_Boss = false;
     this.is_Slave = false;
-    this.type = type;
+    this.type = (type in stats) ? type : 'Default';
     this.raw = {
       x: x,
       y: y,
       w: w,
       h: h,
     };
-    this.pbouncy = false; //if projectiles can bounce
-    this.bounceTime = 0; //bounce time
-    this.pwavy = false;
-    this.pfrequency = 1;
-    this.pamplitude = 1;
-    this.p_rscale = 5; //changes projectile speed (bigger = slower)
+    this.projectile_directions = stats[this.type].projectile_directions;
+    this.last_direction = stats[this.type].last_direction;
+    this.projectile_type = stats[this.type].projectile_type;
+    this.pdamage = stats[this.type].damage;
+    this.p_cd = stats[this.type].cooldown;
+    this.p_rscale = stats[this.type].projectileSlowness;
+    this.pbouncy = stats[this.type].isBouncy;
+    this.bounceTime = stats[this.type].bounceTime;
+    this.pwavy = stats[this.type].isWavy;
+    this.pfrequency = stats[this.type].frequency;
+    this.pamplitude = stats[this.type].amplitude;
     this.x,
       this.y,
       this.w,
       this.h,
-      this.corners,
-      this.last_direction,
-      this.pdamage, //how much damage a projectile deals
-      this.p_cd; //projectile shooting cooldown
-    switch (this.type) {
-      case "Ice Wizard":
-        this.projectile_directions = [0, 1, 1, 1, 1, 1, 1, 1, 1];
-        this.last_direction = 1;
-        this.projectile_type = "Freeze";
-        this.pdamage = 150;
-        this.p_cd = 1000;
-        break;
-      case "Cry Baby":
-        this.projectile_directions = [0, 0, 0, 0, 1, 0, 1, 0, 0];
-        this.last_direction = 4;
-        this.projectile_type = "BigTear";
-        this.pdamage = 175;
-        this.p_cd = 3750;
-        this.pbouncy = true;
-        this.p_rscale = 7;
-        this.bounceTime = 10000;
-        break;
-      case "Mega Org":
-        this.projectile_directions = [1, 0, 0, 0, 0, 0, 0, 0, 0];
-        this.last_direction = 0;
-        this.projectile_type = "BigSnipe";
-        this.pdamage = 400;
-        this.p_cd = 3750;
-        break;
-      case "Frosty":
-        this.projectile_directions = [0, 1, 0, 1, 0, 1, 0, 1, 0];
-        this.last_direction = 1;
-        this.projectile_type = "Arrow";
-        this.pdamage = 100;
-        this.p_cd = 875;
-        this.p_rscale = 4;
-        break;
-      case "Crier":
-        this.projectile_directions = [0, 0, 0, 0, 0, 1, 0, 0, 0];
-        this.last_direction = 5;
-        this.projectile_type = "Tear";
-        this.pdamage = 175;
-        this.p_cd = 1100;
-        this.p_rscale = 2;
-        break;
-      case "Org":
-        this.projectile_directions = [1, 0, 0, 0, 0, 0, 0, 0, 0];
-        this.last_direction = 0;
-        this.projectile_type = "Snipe";
-        this.pdamage = 250;
-        this.p_cd = 5000;
-        break;
-    }
+      this.corners;
   }
   update_values() {
     let unit = this.unit === 'u' ? u : this.unit === 'u2' ? u2 : 1;
