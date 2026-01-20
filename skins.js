@@ -33,20 +33,33 @@ let skin_colors = {
     damaged_body: "Magenta",
     left_eye: "black",
     right_eye: "black",
+    left_eye_brow: "black",
+    right_eye_brow: "black",
+    mouth: "black",
+    outline: "black",
   },
   Crier: {
     body: "darkblue",
     damaged_body: "RoyalBlue",
     left_tear: "lightblue",
     left_eye: "white",
+    left_eye_brow: "white",
     right_tear: "lightblue",
     right_eye: "white",
+    right_eye_brow: "white",
+    mouth: "white",
+    outline: "black",
   },
   Org: {
     body: "darkgreen",
     damaged_body: "DarkSeaGreen",
-    big_eye: "white",
+    outer_eye: "white",
+    big_eye: "maroon",
     small_eye: "black",
+    eye_brow: "SaddleBrown",
+    eye_brow_outline: "black",
+    mouth: "black",
+    outline: "black",
   },
   //Projectiles
   Freeze: {
@@ -81,6 +94,11 @@ let skin_colors = {
 
 function draw_enemy_skin(Enemy, _c = c) {
   //console.log("argument passed: ", Enemy);
+  const w = Enemy.w;
+  const h = Enemy.h;
+  const x = Enemy.x;
+  const y = Enemy.y;
+  const o = (base, unit, dimension=1, offset=1) => base + ((unit/dimension)*offset);
   if (Enemy.is_Boss) {
     //console.log("is Boss is true!");
     switch (Enemy.type) {
@@ -289,28 +307,62 @@ function draw_enemy_skin(Enemy, _c = c) {
   } else if (Enemy.is_Slave) {
     //console.log("is slave is true!");
     switch (Enemy.type) {
-      case slave_types[0]:
+      case slave_types[0]: //Frosty
         //console.log("type matched", slave_types[0]);
         Enemy.damage_active
           ? null
           : (Enemy.enemyColor = skin_colors[Enemy.type].body);
+
+        //left eye brow
+        _c.begin();
+        _c.set_property("fillStyle", skin_colors[Enemy.type].left_eye_brow);
+        _c.moveTo(x, o(y, h, 4));
+        _c.lineTo(o(x, w, 8), o(y, h, 8));
+        _c.lineTo(o(x, w, 8, 3), o(y, h, 8));
+        _c.fill();
+
         //left eye
         _c.begin();
-        _c.set_property("strokeStyle", skin_colors[Enemy.type].left_eye);
-        _c.moveTo(Enemy.x + Enemy.w / 8, Enemy.y + Enemy.h / 2);
-        _c.lineTo(Enemy.x + Enemy.w / 4, Enemy.y + Enemy.h / 4);
-        _c.lineTo(Enemy.x + (Enemy.w / 8) * 3, Enemy.y + Enemy.h / 2);
-        _c.stroke();
+        _c.set_property("fillStyle", skin_colors[Enemy.type].left_eye);
+        _c.moveTo(o(x, w, 8), o(y, h, 2));
+        _c.lineTo(o(x, w, 4), o(y, h, 4));
+        _c.lineTo(o(x, w, 8, 3), o(y, h, 2));
+        _c.lineTo(o(x, w, 4), o(y, h, 8, 3));
+        _c.fill();
+
+        //right eye brow
+        _c.begin();
+        _c.set_property("fillStyle", skin_colors[Enemy.type].right_eye_brow);
+        _c.moveTo(o(x, w, 8, 5), o(y, h, 8));
+        _c.lineTo(o(x, w, 8, 7), o(y, h, 8));
+        _c.lineTo(o(x, w), o(y, h, 4));
+        _c.fill();
 
         //right eye
+       _c.begin();
+        _c.set_property("fillStyle", skin_colors[Enemy.type].right_eye);
+        _c.moveTo(o(x, w, 8, 5), o(y, h, 2));
+        _c.lineTo(o(x, w, 4, 3), o(y, h, 4));
+        _c.lineTo(o(x, w, 8, 7), o(y, h, 2));
+        _c.lineTo(o(x, w, 8, 6), o(y, h, 8, 3));
+        _c.fill();
+
+        //mouth
         _c.begin();
-        _c.set_property("strokeStyle", skin_colors[Enemy.type].right_eye);
-        _c.moveTo(Enemy.x + (Enemy.w / 8) * 5, Enemy.y + Enemy.h / 2);
-        _c.lineTo(Enemy.x + (Enemy.w / 4) * 3, Enemy.y + Enemy.h / 4);
-        _c.lineTo(Enemy.x + (Enemy.w / 8) * 7, Enemy.y + Enemy.h / 2);
-        _c.stroke();
+        _c.set_property("fillStyle", skin_colors[Enemy.type].mouth);
+        _c.moveTo(o(x, w, 8), o(y, h, 8, 5));
+        _c.lineTo(o(x, w, 8, 7), o(y, h, 8, 5));
+        _c.lineTo(o(x, w, 8, 6), o(y, h, 8, 6));
+        _c.lineTo(o(x, w, 2), o(y, h, 8, 7));
+        _c.lineTo(o(x, w, 4), o(y, h, 8, 6));
+        _c.fill();
+
+        //outline
+        _c.begin();
+        _c.set_property("strokeStyle", skin_colors[Enemy.type].outline);
+        _c.strokeRect(x, y, w, h);
         break;
-      case slave_types[1]:
+      case slave_types[1]: //Crier
         Enemy.damage_active
           ? null
           : (Enemy.enemyColor = skin_colors[Enemy.type].body);
@@ -318,69 +370,122 @@ function draw_enemy_skin(Enemy, _c = c) {
         _c.begin();
         _c.set_property("fillStyle", skin_colors[Enemy.type].left_tear);
         _c.fillRect(
-          Enemy.x + Enemy.w / 8,
-          Enemy.y + Enemy.h / 4,
-          Enemy.w / 4,
-          (Enemy.h / 4) * 3
+          o(x, w, 8),
+          o(y, h, 2),
+          o(0, w, 4),
+          o(0, h, 2)
         );
+        //left eye brow
+        _c.begin();
+        _c.set_property("fillStyle", skin_colors[Enemy.type].left_eye_brow);
+        _c.moveTo(o(x, w, 8), o(y, h, 8, 3));
+        _c.lineTo(o(x, w, 4), o(y, h, 4));
+        _c.lineTo(o(x, w, 8, 3), o(y, h, 4));
+        _c.fill();
         //left eye
         _c.begin();
         _c.set_property("fillStyle", skin_colors[Enemy.type].left_eye);
-        _c.arc(
-          Enemy.x + Enemy.w / 4,
-          Enemy.y + Enemy.h / 4,
-          Enemy.w / 8,
-          0,
-          2 * Math.PI
-        );
+        _c.moveTo(o(x, w, 8), o(y, h, 2));
+        _c.lineTo(o(x, w, 4), o(y, h, 8, 3));
+        _c.lineTo(o(x, w, 8, 3), o(y, h, 8, 3));
+        _c.lineTo(o(x, w, 8, 3), o(y, h, 2));
         _c.fill();
         //right tear
         _c.begin();
         _c.set_property("fillStyle", skin_colors[Enemy.type].right_tear);
         _c.fillRect(
-          Enemy.x + (Enemy.w / 8) * 5,
-          Enemy.y + Enemy.h / 4,
-          Enemy.w / 4,
-          (Enemy.h / 4) * 3
+          o(x, w, 8, 5),
+          o(y, h, 2),
+          o(0, w, 4),
+          o(0, h, 2)
         );
+        //right eye brow
+        _c.begin();
+        _c.set_property("fillStyle", skin_colors[Enemy.type].right_eye_brow);
+        _c.moveTo(o(x, w, 8, 5), o(y, h, 4));
+        _c.lineTo(o(x, w, 4, 3), o(y, h, 4));
+        _c.lineTo(o(x, w, 8, 7), o(y, h, 8, 3));
+        _c.fill();
         //right eye
         _c.begin();
         _c.set_property("fillStyle", skin_colors[Enemy.type].right_eye);
-        _c.arc(
-          Enemy.x + (Enemy.w / 4) * 3,
-          Enemy.y + Enemy.h / 4,
-          Enemy.w / 8,
-          0,
-          2 * Math.PI
-        );
+        _c.moveTo(o(x, w, 8, 5), o(y, h, 8, 3));
+        _c.lineTo(o(x, w, 4, 3), o(y, h, 8, 3));
+        _c.lineTo(o(x, w, 8, 7), o(y, h, 2));
+        _c.lineTo(o(x, w, 8, 5), o(y, h, 2));
         _c.fill();
+        //mouth
+        _c.begin();
+        _c.set_property("fillStyle", skin_colors[Enemy.type].mouth);
+        _c.moveTo(o(x, w, 8, 3), o(y, h, 8, 7));
+        _c.lineTo(o(x, w, 2), o(y, h, 4, 3));
+        _c.lineTo(o(x, w, 8, 5), o(y, h, 8, 7));
+        _c.fill();
+        //outline
+        _c.begin();
+        _c.set_property("strokeStyle", skin_colors[Enemy.type].outline);
+        _c.strokeRect(x, y, w, h);
         break;
-      case slave_types[2]:
+      case slave_types[2]: //org
         Enemy.damage_active
           ? null
           : (Enemy.enemyColor = skin_colors[Enemy.type].body);
-        //white eye
+        //outer eye
+        _c.begin();
+        _c.set_property("fillStyle", skin_colors[Enemy.type].outer_eye);
+        _c.moveTo(o(x, w, 8), o(y, h, 8, 3));
+        _c.lineTo(o(x, w, 4), o(y, h, 4));
+        _c.lineTo(o(x, w, 2), o(y, h, 8));
+        _c.lineTo(o(x, w, 4, 3), o(y, h, 4));
+        _c.lineTo(o(x, w, 8, 7), o(y, h, 8, 3));
+        _c.lineTo(o(x, w, 4, 3), o(y, h, 2));
+        _c.lineTo(o(x, w, 2), o(y, h, 8, 5));
+        _c.lineTo(o(x, w, 4), o(y, h, 2));
+        _c.fill();
+        //big eye
         _c.begin();
         _c.set_property("fillStyle", skin_colors[Enemy.type].big_eye);
         _c.arc(
-          Enemy.x + Enemy.w / 2,
-          Enemy.y + Enemy.h / 2,
-          Enemy.w / 4,
+          o(x, w, 2),
+          o(y, h, 8, 3),
+          o(0, w, 16, 3),
           0,
           2 * Math.PI
         );
         _c.fill();
-        //black eye
+        //small eye
         _c.begin();
         _c.set_property("fillStyle", skin_colors[Enemy.type].small_eye);
-        _c.arc(
-          Enemy.x + Enemy.w / 2,
-          Enemy.y + Enemy.h / 2,
-          Enemy.w / 8,
+         _c.arc(
+          o(x, w, 2),
+          o(y, h, 8, 3),
+          o(0, w, 8),
           0,
           2 * Math.PI
         );
         _c.fill();
+        //eye brow
+        _c.begin();
+        _c.set_property("fillStyle", skin_colors[Enemy.type].eye_brow);
+        _c.fillRect(o(x, w, 4), y, o(0, w, 2), o(0, h, 8));
+        //eye brow outline
+        _c.begin();
+        _c.set_property("strokeStyle", skin_colors[Enemy.type].eye_brow_outline);
+        _c.strokeRect(o(x, w, 4), y, o(0, w, 2), o(0, h, 8));
+        //mouth
+        _c.begin();
+        _c.set_property("fillStyle", skin_colors[Enemy.type].mouth);
+        _c.moveTo(o(x, w, 8), o(y, h, 8, 5));
+        _c.lineTo(o(x, w, 8, 3), o(y, h, 4, 3));
+        _c.lineTo(o(x, w, 8, 5), o(y, h, 4, 3));
+        _c.lineTo(o(x, w, 8, 7), o(y, h, 8, 5));
+        _c.lineTo(o(x, w, 8, 5), o(y, h, 8, 7));
+        _c.lineTo(o(x, w, 8, 3), o(y, h, 8, 7));
+        _c.fill();
+        //outline
+        _c.begin();
+        _c.set_property("strokeStyle", skin_colors[Enemy.type].outline);
+        _c.strokeRect(x, y, w, h);
         break;
     }
   }
