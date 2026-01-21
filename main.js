@@ -267,28 +267,26 @@ function draw_apples() {
 }
 
 function draw_enemies() {
-  for (enemy of enemies) {
+  for (let enemy of enemies) {
+    
+    const enemyCenterX = enemy.x + (enemy.w / 2);
+    const txt = `${enemy.hp.toFixed(2)} HP`;
+    
+    const textSize = enemy.h / 500; 
+    const textY = enemy.y - (enemy.h / 10);
+
     c.begin();
     c.set_property("fillStyle", enemy.enemyColor);
     c.fillRect(enemy.x, enemy.y, enemy.w, enemy.h);
-    c.begin();
-    c.set_property("lineWidth", 4);
-    c.set_property("strokeStyle", "black");
-    c.strokeText(
-      `${enemy.hp.toFixed(2)} HP`,
-      enemy.x,
-      enemy.y - enemy.h / 300,
-      enemy.h / 300
-    );
 
     c.begin();
+    c.set_property("textAlign", "center");  
+    c.set_property("lineWidth", 4);
+    c.set_property("strokeStyle", "black");
+    c.strokeText(txt, enemyCenterX, textY, textSize);
     c.set_property("fillStyle", "purple");
-    c.fillText(
-      `${enemy.hp.toFixed(2)} HP`,
-      enemy.x,
-      enemy.y - enemy.h / 300,
-      enemy.h / 300
-    );
+    c.fillText(txt, enemyCenterX, textY, textSize);
+
     draw_enemy_skin(enemy);
     enemy.update_values();
   }

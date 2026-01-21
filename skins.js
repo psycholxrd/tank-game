@@ -5,11 +5,25 @@ let skin_colors = {
   "Ice Wizard": {
     body: "pink",
     damaged_body: "LightCoral",
+    left_eyebrow: "lightblue",
     left_eye: "white",
+    left_eyeball_inner: "AliceBlue",
+    left_eyeball_outer: "LightSteelBlue",
+    right_eyebrow: "lightblue",
     right_eye: "white",
-    mouth: "white",
+    right_eyeball_inner: "AliceBlue",
+    right_eyeball_outer: "LightSteelBlue",
+    wrinkles: "black",
+    jawlines: "black",
+    left_ear_inner: "pink",
+    right_ear_inner: "pink",
+    left_ear_outer: "black",
+    right_ear_outer: "black",
+    mouth: "black",
+    nose_outer: "black",
     upper_beard: "lightblue",
     bottom_beard: "lightblue",
+    outline: "black",
   },
   "Cry Baby": {
     body: "SlateBlue",
@@ -94,71 +108,213 @@ let skin_colors = {
 
 function draw_enemy_skin(Enemy, _c = c) {
   //console.log("argument passed: ", Enemy);
-  const w = Enemy.w;
-  const h = Enemy.h;
-  const x = Enemy.x;
-  const y = Enemy.y;
+  const w = Enemy.w; //this is basically 100% for x
+  const h = Enemy.h; //this is basically 100% for y
+  const x = Enemy.x; //this is the starting x point of the "skin coordinate system"
+  const y = Enemy.y; //this is the starting y point of the "skin coordinate system"
+  /*
+  EXPLANATION:
+    o function is 1-dimensional.
+    base = starting point. Basically coordinate origin offsetted by base.
+    unit = 100%. If it's 10 for example, then 2 would be 20% of it.
+    dimension = percentage scaling. if unit = 10 and dimension = 2, then we are using 20% steps each time
+    offset = how many steps we take. it can go below 0% and above 100%.
+  */
   const o = (base, unit, dimension=1, offset=1) => base + ((unit/dimension)*offset);
+  const x16 = (input_x) => o(x, w, 16, input_x); //16% steps for more accurate drawings
+  const y16 = (input_y) => o(y, h, 16, input_y); //16% steps for more accurate drawings
+  //helper function for bosses to reduce code size
+  const fillPath16 = (color, path) => {
+    _c.begin();
+    _c.set_property("fillStyle", color);
+    _c.moveTo(x16(path[0][0]), y16(path[0][1]));
+    for(let i = 1; i < path.length; i++){
+      let destination = path[i];
+      _c.lineTo(x16(destination[0]), y16(destination[1]));
+    }
+    _c.fill();
+  }
+  //helper function for bosses to reduce code size
+  const strokePath16 = (color, path) => {
+    _c.begin();
+    _c.set_property("strokeStyle", color);
+    _c.moveTo(x16(path[0][0]), y16(path[0][1]));
+    for(let i = 1; i < path.length; i++){
+      let destination = path[i];
+      _c.lineTo(x16(destination[0]), y16(destination[1]));
+    }
+    _c.stroke();
+  }
   if (Enemy.is_Boss) {
-    //console.log("is Boss is true!");
     switch (Enemy.type) {
-      case boss_types[0]:
-        //console.log("type matched", boss_types[0]);
+      case boss_types[0]: //Ice Wizard
         Enemy.damage_active
           ? null
           : (Enemy.enemyColor = skin_colors[Enemy.type].body);
+        
         //left eye
+        fillPath16(skin_colors[Enemy.type].left_eye, [
+          [2, 6],
+          [4, 5],
+          [7, 6],
+          [7, 7],
+          [5, 8],
+          [3, 7]
+        ]);
+        //left eye ball
         _c.begin();
-        _c.set_property("fillStyle", skin_colors[Enemy.type].left_eye);
-        _c.moveTo(Enemy.x + Enemy.w / 8, Enemy.y + Enemy.h / 2);
-        _c.lineTo(Enemy.x + Enemy.w / 8, Enemy.y + Enemy.h / 4);
-        _c.lineTo(Enemy.x + (Enemy.w / 8) * 3, Enemy.y + Enemy.h / 2);
+        _c.set_property('fillStyle', skin_colors[Enemy.type].left_eyeball_inner);
+        _c.arc(x16(5), y16(7), o(0, w, 16), 0, Math.PI*2);
         _c.fill();
 
+        _c.begin();
+        _c.set_property('strokeStyle', skin_colors[Enemy.type].left_eyeball_outer);
+        _c.arc(x16(5), y16(7), o(0, w, 16), 0, Math.PI*2);
+        _c.stroke();
+        //left eye brow
+        fillPath16(skin_colors[Enemy.type].left_eyebrow, [
+          [1, 5],
+          [3, 3],
+          [5, 3],
+          [7, 4],
+          [7, 5],
+          [5, 5],
+          [3, 4],
+        ]);
         //right eye
+        fillPath16(skin_colors[Enemy.type].right_eye, [
+          [9, 6],
+          [12, 5],
+          [14, 6],
+          [13, 7],
+          [11, 8],
+          [9, 7]
+        ]);
+        //right eye ball
         _c.begin();
-        _c.set_property("fillStyle", skin_colors[Enemy.type].right_eye_eye);
-        _c.moveTo(Enemy.x + (Enemy.w / 8) * 5, Enemy.y + Enemy.h / 2);
-        _c.lineTo(Enemy.x + (Enemy.w / 8) * 7, Enemy.y + Enemy.h / 4);
-        _c.lineTo(Enemy.x + (Enemy.w / 8) * 7, Enemy.y + Enemy.h / 2);
+        _c.set_property('fillStyle', skin_colors[Enemy.type].right_eyeball_inner);
+        _c.arc(x16(11), y16(7), o(0, w, 16), 0, Math.PI*2);
         _c.fill();
 
-        //beard
-
-        //top light blue half circle
         _c.begin();
-        _c.set_property("fillStyle", skin_colors[Enemy.type].upper_beard);
-        _c.arc(
-          Enemy.x + Enemy.w / 2,
-          Enemy.y + Enemy.h,
-          Enemy.w / 3,
-          1 * Math.PI,
-          0
-        );
-        _c.fill();
-        //inner white circle
+        _c.set_property('strokeStyle', skin_colors[Enemy.type].right_eyeball_outer);
+        _c.arc(x16(11), y16(7), o(0, w, 16), 0, Math.PI*2);
+        _c.stroke();
+        //right eye brow
+        fillPath16(skin_colors[Enemy.type].right_eyebrow, [
+          [9, 4],
+          [11, 3],
+          [13, 3],
+          [15, 5],
+          [13, 4],
+          [11, 5],
+          [9, 5]
+        ]);
+        //wrinkles
+        strokePath16(skin_colors[Enemy.type].wrinkles, [
+          [5, 1],
+          [11, 1]
+        ]);
+        strokePath16(skin_colors[Enemy.type].wrinkles, [
+          [4, 2],
+          [12, 2]
+        ]);
+        //jawlines
+        strokePath16(skin_colors[Enemy.type].jawlines, [
+          [1, 9],
+          [2, 11],
+          [3, 12],
+          [3, 13],
+        ]);
+        strokePath16(skin_colors[Enemy.type].jawlines, [
+          [15, 9],
+          [14, 11],
+          [13, 12],
+          [13, 13],
+        ]);
+        //mouth
+        fillPath16(skin_colors[Enemy.type].mouth, [
+          [7, 13],
+          [9, 13],
+          [10, 15],
+          [6, 15],
+        ]);
+        //left ear
+        fillPath16(skin_colors[Enemy.type].left_ear_inner, [
+          [0, 7],
+          [-1, 6],
+          [-2, 7],
+          [-1, 9],
+          [0, 10],
+        ]);
+        strokePath16(skin_colors[Enemy.type].left_ear_outer, [
+          [0, 7],
+          [-1, 6],
+          [-2, 7],
+          [-1, 9],
+          [0, 10],
+        ]);
+        //right ear
+        fillPath16(skin_colors[Enemy.type].right_ear_inner, [
+          [16, 7],
+          [17, 6],
+          [18, 7],
+          [17, 9],
+          [16, 10],
+        ]);
+        strokePath16(skin_colors[Enemy.type].right_ear_outer, [
+          [16, 7],
+          [17, 6],
+          [18, 7],
+          [17, 9],
+          [16, 10],
+        ]);
+        //outline
         _c.begin();
-        _c.set_property("fillStyle", skin_colors[Enemy.type].mouth);
-        _c.arc(
-          Enemy.x + Enemy.w / 2,
-          Enemy.y + (Enemy.h / 8) * 7,
-          Enemy.w / 10,
-          0,
-          2 * Math.PI
-        );
-        _c.fill();
-        //bottom part of the beard
-        _c.begin();
-        _c.set_property("fillStyle", skin_colors[Enemy.type].bottom_beard);
-        _c.moveTo(Enemy.x + Enemy.w / 2 - Enemy.w / 3, Enemy.y + Enemy.h);
-        _c.lineTo(Enemy.x + Enemy.w / 2 + Enemy.w / 3, Enemy.y + Enemy.h);
-        _c.lineTo(Enemy.x + Enemy.w / 2 + Enemy.w / 3, Enemy.y + Enemy.h * 1.5);
-        _c.lineTo(Enemy.x + Enemy.w / 2 + Enemy.w / 6, Enemy.y + Enemy.h * 1.25);
-        _c.lineTo(Enemy.x + Enemy.w / 2, Enemy.y + Enemy.h * 1.5);
-        _c.lineTo(Enemy.x + Enemy.w / 2 - Enemy.w / 6, Enemy.y + Enemy.h * 1.25);
-        _c.lineTo(Enemy.x + Enemy.w / 2 - Enemy.w / 3, Enemy.y + Enemy.h * 1.5);
-        _c.lineTo(Enemy.x + Enemy.w / 2 - Enemy.w / 3, Enemy.y + Enemy.h); //last line
-        _c.fill();
+        _c.set_property("strokeStyle", skin_colors[Enemy.type].outline);
+        _c.strokeRect(x, y, w, h);
+        //upper beard
+        fillPath16(skin_colors[Enemy.type].upper_beard, [
+          [2, 16],
+          [4, 12],
+          [6, 11],
+          [10, 11],
+          [12, 12],
+          [14, 16],
+          [13, 19],
+          [13, 20],
+          [12, 19],
+          [12, 17],
+          [10, 13],
+          [6, 13],
+          [4, 17],
+          [4, 19],
+          [3, 20],
+          [3, 19]
+        ]);
+        //bottom beard
+        fillPath16(skin_colors[Enemy.type].bottom_beard, [
+          [6, 16],
+          [10, 16],
+          [9, 18],
+          [8, 19],
+          [7, 18],
+        ]);
+        //nose
+        strokePath16(skin_colors[Enemy.type].nose_outer, [
+          [8, 7],
+          [7, 8],
+          [7, 10],
+        ]);
+        strokePath16(skin_colors[Enemy.type].nose_outer, [
+          [7, 9],
+          [6, 10],
+          [7, 11],
+        ]);
+        strokePath16(skin_colors[Enemy.type].nose_outer, [
+          [8, 11],
+          [9, 10],
+        ]);
         break;
       case boss_types[1]:
         Enemy.damage_active
@@ -218,7 +374,7 @@ function draw_enemy_skin(Enemy, _c = c) {
           Enemy.w / 8,
           Enemy.h / 4
         );
-        //right legt
+        //right leg
         _c.begin();
         _c.set_property("fillStyle", Enemy.enemyColor);
         _c.fillRect(

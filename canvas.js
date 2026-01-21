@@ -70,6 +70,9 @@ class Canvas {
   moveTo(x, y) {
     this.ctx.moveTo(x, y);
   }
+  measureText(txt) {
+    return this.ctx.measureText(txt);
+  }
   lineTo(x, y) {
     this.ctx.lineTo(x, y);
   }

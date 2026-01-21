@@ -217,9 +217,27 @@ let default_levels = {
   }
 };
 let levels = {};
+function deepCloneLevel(source, target){
+  const t_keys = Object.keys(target);
+  if('enemies' in t_keys) target.enemies.length = 0;
+  if('apples' in t_keys) target.apples.length = 0;
+  const s_apples = source.apples;
+  const s_enemies = source.enemies;
+  for(let s_apple of s_apples){
+    target.apples.push(s_apple);
+  }
+  for(let s_enemy of s_enemies){
+    target.enemies.push(s_enemy);
+  }
+}
+
 for(let num in default_levels){
   let saved = localStorage.getItem(`[Tanks] Level ${num}`);
-  levels[num] = saved ? JSON.parse(saved) : default_levels[num];
+  levels[num] = {
+    apples: [],
+    enemies: [],
+  };
+  saved? levels[num] = JSON.parse(saved) : deepCloneLevel(default_levels[num], levels[num]);
 }
 
 function load_level(number) {
