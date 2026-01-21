@@ -38,7 +38,13 @@
           <b class = "level-editor-text">Settings:</b>
           <a class = "level-editor-text">Grid Intensity</a>
           <input type = "range" min = "1" max = "4" value = "4" id = "grid-intensity"></input>
+           <b class = "level-editor-text">Level changes:</b>
           <div class = "level-editor-btn" onclick = open_level_selector()>Return to Selector</div>
+          <div class = "level-editor-btn" onclick = export_level()>Export level</div>
+          <div class = "level-editor-btn" onclick = import_level()>Import level</div>
+          <div class = "level-editor-btn" onclick = remember_level()>Remember level</div>
+          <div class = "level-editor-btn" onclick = forget_level()>Forget level</div>
+          <div class = "level-editor-btn" onclick = reset_level()>Reset to default</div>
         </div>
       </div>
     </div>

@@ -304,7 +304,6 @@ function proj_loop() {
 }
 
 function start_proj_loop() {
-  console.log(enemies);
   for (const enemy of enemies) {
     create_projectiles(enemy);
     let p_timer = new ProjClock(enemy.p_cd);
@@ -568,7 +567,6 @@ function apply_shoot_enemy(_x, _y) {
       _y > enemy.corners.lu.y &&
       _y < enemy.corners.rd.y
     ) {
-      console.log("Enemy hit!");
       enemy.hp -= (you.damage * 100) / get_rgb()[0];
       enemy.damage_active = true;
       enemy.enemyColor = skin_colors[enemy.type].damaged_body;
@@ -770,7 +768,6 @@ function drawEditorEnemies(_enemies){
         _enemy.is_Boss = true;
         break;
     }
-    //console.log(_enemy);
     _enemy.update_values();
     _enemy.damage_active
           ? null
@@ -783,6 +780,7 @@ function drawEditorEnemies(_enemies){
 }
 
 let editor_level = {enemies: [], apples: []}; //default
+let active_editor_level;
 let u3 = 1;
 let entity_default_canvases = {
   slaves: [],
@@ -861,7 +859,6 @@ function new_entity_canvas(entity_type, name, clone = false){
   let _c = new Canvas(_canvas, _ctx);
   if(!clone){
     _canvas.addEventListener('mousedown', (e) => {
-      console.log(entity_type, name);
       last_editor_type = entity_type;
       last_editor_entity = name;
       start_entity_drag(entity_type, name, e);
@@ -883,7 +880,6 @@ function new_entity_canvas(entity_type, name, clone = false){
     _c.set_property("fillStyle", _apple.color);
     _c.arc(_apple.x, _apple.y, _apple.r, 0, 2 * Math.PI);
     _c.fill();
-    console.log(_apple);
     return _c;
   }
   const sF = 5;
@@ -899,7 +895,6 @@ function new_entity_canvas(entity_type, name, clone = false){
         break;
     }
   _enemy.update_values();
-  console.log(_enemy.type, skin_colors[_enemy.type]);
   _enemy.damage_active
       ? null
       : (_enemy.enemyColor = skin_colors[_enemy.type].body);
@@ -924,6 +919,7 @@ function create_entity_default_canvases(){
 
 function open_level(key){
   editor_level = levels[key];
+  active_editor_level = key;
   create_entity_default_canvases();
   change_screen('level-editor');
   draw_grid(debug.grid.a, debug.grid.b, c2, true, false);
@@ -950,6 +946,61 @@ function loadLevelButtons(){
   level_selector_cont.appendChild(btn);
 }
 loadLevelButtons();
+
+//functions for level loading/saving
+function export_level(){
+  window.navigator.clipboard.writeText(JSON.stringify(editor_level));
+  alert('copied!');
+}
+
+function import_level(){
+  let level_contents = prompt('Enter the exported level data', '{"apples": [], "enemies": [[3.25, 2.25, 0.5, "slave", "Frosty"]]}');
+  let level_obj;
+  if(level_contents !== null && level_contents !== ''){
+    try{
+      level_obj = JSON.parse(level_contents);
+    }catch(err){
+      let problems = [];
+      let problem_str = 'Importing failed! Possible problems:';
+      if(!level_contents.includes('{') || !level_contents.includes('}')) problems.push('imported Level is probably not an object');
+      if(!level_contents.includes('enemies')) problems.push('Missing enemies key');
+      if(!level_contents.includes('apples')) problems.push('Missing apples key');
+      if(problems.length === 0) problems.push(err);
+      for(let problem of problems){
+        problem_str += `\n- ${problem}`;
+      }
+      alert(problem_str);
+      return;
+    }
+  }else{
+    return;
+  }
+  if(!level_obj.enemies || level_obj.enemies.length === 0){
+    alert('need at least 1 enemy!');
+    return;
+  }
+  levels[active_editor_level] = level_obj;
+  editor_level = levels[active_editor_level];
+}
+
+function remember_level(){
+  localStorage.setItem(`[Tanks] Level ${active_editor_level}`, JSON.stringify(editor_level));
+  alert('Successfully remembered level! It will now automatically load even when you refresh the page. To undo this, click the "Forget level" button.');
+}
+
+function forget_level(){
+  let answer = confirm('Are you sure you want to forget level?\nAfter you do this, your changes will be deleted once you refresh the page.');
+  if(answer) localStorage.removeItem(`[Tanks] Level ${active_editor_level}`);
+}
+
+function reset_level(){
+  let answer = confirm('Are you sure you want to reset Level?\nAll your changes will be deleted,\nunless you pressed Remember level\nand reload the page.');
+  if(answer){
+    levels[active_editor_level] = default_levels[active_editor_level];
+    editor_level = levels[active_editor_level];
+    alert('Resetting completed.');
+  }
+}
 
 //check if dead
 function spawn_player() {
