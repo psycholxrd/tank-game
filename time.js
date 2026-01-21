@@ -1,46 +1,51 @@
+function old60FPSCooldownToMilliseconds(cooldown){
+  return (cooldown/60)*1000;
+}
+
 class Clock {
   constructor() {
-    this.cd = {
-      locked: {
-        enemy_knock_damage: false,
-        shoot_enemy: false,
-      },
-      default: {
-        enemy_knock_damage: 40,
-        shoot_enemy: 25,
-      },
-      current: {
-        enemy_knock_damage: 40,
-        shoot_enemy: 25,
-      },
+    this._expiresAt = {
+      enemy_knock_damage: 0,
+      shoot_enemy: 0,
     };
-  }
 
-  cycle_cooldown(type) {
-    if (this.cd.current[type] > 0) {
-      //console.log(`Cooldown active: ${this.cd.current[type]}`);
-      this.cd.current[type]--;
-      requestAnimationFrame(() => this.cycle_cooldown(type));
-    } else {
-      //console.log(`Cooldown ended: ${type}`);
-      this.cd.current[type] = this.cd.default[type]; // Reset cooldown
-      this.cd.locked[type] = false; // Unlock
-    }
+    this.cd = {
+      default: {
+        enemy_knock_damage: old60FPSCooldownToMilliseconds(40),
+        shoot_enemy: old60FPSCooldownToMilliseconds(25),
+      },
+
+      locked: {
+        get enemy_knock_damage() {
+          return performance.now() < this._parent._expiresAt.enemy_knock_damage;
+        },
+        get shoot_enemy() {
+          return performance.now() < this._parent._expiresAt.shoot_enemy;
+        },
+        _parent: this
+      },
+
+      current: {
+        get enemy_knock_damage() {
+          return Math.max(0, this._parent._expiresAt.enemy_knock_damage - performance.now());
+        },
+        get shoot_enemy() {
+          return Math.max(0, this._parent._expiresAt.shoot_enemy - performance.now());
+        },
+        _parent: this
+      }
+    };
   }
 
   enemy_knock_damage() {
     if (!this.cd.locked.enemy_knock_damage) {
-      // Only start if not already running
-      this.cd.locked.enemy_knock_damage = true;
-      requestAnimationFrame(() => this.cycle_cooldown("enemy_knock_damage"));
+      this._expiresAt.enemy_knock_damage = performance.now() + this.cd.default.enemy_knock_damage;
     }
   }
 
   shoot_enemy() {
     if (!this.cd.locked.shoot_enemy) {
-      // Only start if not already running
-      this.cd.locked.shoot_enemy = true;
-      requestAnimationFrame(() => this.cycle_cooldown("shoot_enemy"));
+      this._expiresAt.shoot_enemy = performance.now() + this.cd.default.shoot_enemy;
     }
   }
 }
