@@ -636,12 +636,12 @@ function change_screen(new_screen){
 
 //temporary
 function handleGameFinished(){
+  window.requestAnimationFrame(handleGameFinished);
   if(!game_active && game_completed){
     change_screen('menu');
     updateHighscoreText();
     return;
   }
-  window.requestAnimationFrame(handleGameFinished);
 }
 window.requestAnimationFrame(handleGameFinished);
 

@@ -245,20 +245,21 @@ function load_level(number) {
     starting_time = performance.now();
   }
   if(number == final_level){
-    game_completed = true;
-    game_active = false;
-    final_time = performance.now();
+    final_time = performance.now()-starting_time;
     let last_best = localStorage.getItem('[Tanks] BestTime');
     if(last_best){
-      console.log(JSON.parse(last_best), final_time);
-      if(JSON.parse(last_best) > final_time){
-        console.log('new best time!');
+      let parsed = JSON.parse(last_best);
+      console.log(parsed, final_time);
+      if(parsed > final_time){
+        console.log('new best time!', msToTime(final_time));
         localStorage.setItem('[Tanks] BestTime', final_time);
       }
     }else{
       console.log('new best time!');
       localStorage.setItem('[Tanks] BestTime', final_time);
     }
+    game_completed = true;
+    game_active = false;
     return
   }
   game_completed = false;
