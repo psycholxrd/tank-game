@@ -247,13 +247,15 @@ function draw_tank() {
   c.stroke();
 
   c.begin();
+  c.set_property("textAlign", "center");
   c.set_property("lineWidth", 4);
   c.set_property("strokeStyle", "black");
-  c.strokeText(`${you.hp} HP`, you.x - you.r, you.y + you.r * 1.5, 0.5);
+  c.strokeText(`${you.hp} HP`, you.x, you.y + you.r * 1.5, 0.5);
 
   c.begin();
+  c.set_property("textAlign", "center");
   c.set_property("fillStyle", you.activeColor);
-  c.fillText(`${you.hp} HP`, you.x - you.r, you.y + you.r * 1.5, 0.5);
+  c.fillText(`${you.hp} HP`, you.x, you.y + you.r * 1.5, 0.5);
 }
 
 function draw_apples() {
