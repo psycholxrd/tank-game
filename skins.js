@@ -657,6 +657,10 @@ function draw_enemy_skin(Enemy, _c = c) {
           [5, 12],
           [4, 14]
         ]);
+        //outline
+        _c.begin();
+        _c.set_property("strokeStyle", skin_colors[Enemy.type].outline);
+        _c.strokeRect(x, y, w, h);
         break;
     }
   } else if (Enemy.is_Slave) {
