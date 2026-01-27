@@ -147,6 +147,9 @@ let keys = {
   r: false,
 };
 
+const img = new Image();
+const set_source = () => img.src = `images/level ${current_level}.png`;
+
 function setTime(ms){
   timer.innerHTML = msToTime(ms);
 }
@@ -165,6 +168,9 @@ function draw_game() {
     }
   }
   updatePlayerColor();
+  set_source();
+  c.clear();
+  c.ctx.drawImage(img, 0, 0, pigeon.w, pigeon.h);
   draw_tank();
   draw_grid(debug.grid.a, debug.grid.b);
   check_dead_enemies();
@@ -210,7 +216,6 @@ function draw_tank() {
   you.update_speed();
   you.update_pos();
   you.update_color(...get_rgb());
-  c.clear();
   c.begin();
   c.set_property("lineWidth", 1000 / get_rgb()[0]);
   c.set_property("strokeStyle", you.color);
