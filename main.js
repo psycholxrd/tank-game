@@ -165,7 +165,6 @@ function setTime(ms){
 
 //functions
 function draw_game() {
-  window.requestAnimationFrame(draw_game);
   if(!game_active){
     if(pigeon.el.style.display === 'block') c.clear();
     return;
@@ -190,7 +189,7 @@ function draw_game() {
   apple_collision_check();
   handle_enemy_collision();
 }
-window.requestAnimationFrame(draw_game);
+setInterval(draw_game, 1000/60);
 
 function draw_grid(a, b, _c = c, lines = true, text = true) {
   if (_c == c && !debug.grid.active) return;
