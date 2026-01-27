@@ -15,6 +15,15 @@ const respawn_point = {
   y: u * 7,
 };
 const you = new Player(u / 2, respawn_point.x, respawn_point.y);
+
+window.addEventListener('resize', (e) => {
+  if(!game_active) you.correct_spawn_point;
+});
+
+window.addEventListener('fullscreenchange', (e) => {
+  if(!game_active) you.correct_spawn_point;
+});
+
 let debug = {
   grid: {
     active: false,
@@ -170,6 +179,7 @@ function draw_game() {
   updatePlayerColor();
   set_source();
   c.clear();
+  c.begin();
   c.ctx.drawImage(img, 0, 0, pigeon.w, pigeon.h);
   draw_tank();
   draw_grid(debug.grid.a, debug.grid.b);
@@ -251,6 +261,43 @@ function draw_tank() {
   c.set_property("lineWidth", 2.5);
   c.stroke();
 
+  //hp bar
+  let hp_bar = {
+    x: you.x - you.r,
+    y: you.y + (you.r*1.5),
+  }
+  let full = you.r*2;
+  let get_percent = () => you.hp/starting_HP;
+  let hp_colors = ['lime', 'pink', 'white'];
+  let pick_color = () => {
+    let p = get_percent();
+    if(p<=1){
+      return hp_colors[0];
+    }else if(p<=2){
+      return hp_colors[1];
+    }else{
+      return hp_colors[2];
+    }
+  }
+
+  c.begin();
+  c.set_property('lineCap', 'round');
+  c.set_property("lineWidth", 0.17 * u);
+  c.set_property("strokeStyle", "black");
+  c.moveTo(hp_bar.x, hp_bar.y);
+  c.lineTo(hp_bar.x + (full), hp_bar.y);
+  c.stroke();
+  c.set_property('lineCap', 'butt');
+
+  c.begin();
+  c.set_property('lineCap', 'round');
+  c.set_property("lineWidth", 0.14 * u);
+  c.set_property("strokeStyle", pick_color());
+  c.moveTo(hp_bar.x, hp_bar.y);
+  c.lineTo(hp_bar.x + (((get_percent()-0.01)%1)*full), hp_bar.y);
+  c.stroke();
+  c.set_property('lineCap', 'butt');
+  /*
   c.begin();
   c.set_property("textAlign", "center");
   c.set_property("lineWidth", 4);
@@ -261,6 +308,7 @@ function draw_tank() {
   c.set_property("textAlign", "center");
   c.set_property("fillStyle", you.activeColor);
   c.fillText(`${you.hp} HP`, you.x, you.y + you.r * 1.5, 0.5);
+  */
 }
 
 function draw_apples() {
