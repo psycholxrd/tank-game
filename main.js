@@ -324,16 +324,46 @@ function draw_apples() {
 function draw_enemies() {
   for (let enemy of enemies) {
     
+    /*
     const enemyCenterX = enemy.x + (enemy.w / 2);
     const txt = `${enemy.hp.toFixed(2)} HP`;
     
     const textSize = enemy.h / 500; 
     const textY = enemy.y - (enemy.h / 10);
-
+    */
     c.begin();
     c.set_property("fillStyle", enemy.enemyColor);
     c.fillRect(enemy.x, enemy.y, enemy.w, enemy.h);
 
+    //new healthbars!
+    //hp bar
+    let hp_bar = {
+      x: enemy.x,
+      y: enemy.y - (enemy.h/3),
+    }
+    let full = enemy.w;
+    let get_percent = () => enemy.hp/((enemy.raw.w + enemy.raw.h) * 100);
+
+    c.begin();
+    c.set_property('lineCap', 'round');
+    c.set_property("lineWidth", 0.17 * u);
+    c.set_property("strokeStyle", "black");
+    c.moveTo(hp_bar.x, hp_bar.y);
+    c.lineTo(hp_bar.x + (full), hp_bar.y);
+    c.stroke();
+    c.set_property('lineCap', 'butt');
+    
+    c.begin();
+    c.set_property('lineCap', 'round');
+    c.set_property("lineWidth", 0.14 * u);
+    c.set_property("strokeStyle", "red");
+    c.moveTo(hp_bar.x, hp_bar.y);
+    c.lineTo(hp_bar.x + (get_percent()*full), hp_bar.y);
+    c.stroke();
+    c.set_property('lineCap', 'butt');
+    c.set_property("lineWidth", 4);
+
+    /*
     c.begin();
     c.set_property("textAlign", "center");  
     c.set_property("lineWidth", 4);
@@ -341,7 +371,7 @@ function draw_enemies() {
     c.strokeText(txt, enemyCenterX, textY, textSize);
     c.set_property("fillStyle", "purple");
     c.fillText(txt, enemyCenterX, textY, textSize);
-
+    */
     draw_enemy_skin(enemy);
     enemy.update_values();
   }
