@@ -753,6 +753,7 @@ function start_game(){
   if(game_active) return;
   change_screen('game');
   load_level(1);
+  spawn_player();
   setTimeout(start_proj_loop, 250);
 }
 
@@ -1141,10 +1142,12 @@ function reset_level(){
 
 //check if dead
 function spawn_player() {
-  you.hp = 500;
+  you.hp = starting_HP;
+  you.rFactor = starting_rFactor;
+  you.damage = starting_damage;
+  you.speed = starting_speed;
   you.raw.x = respawn_point.x;
   you.raw.y = respawn_point.y;
-  you.rFactor = 0.75;
 }
 function apply_death() {
   load_level(current_level);
