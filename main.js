@@ -245,6 +245,7 @@ function draw_tank() {
   you.update_radius();
   you.update_speed();
   you.update_pos();
+  you.update_damage();
   you.update_color(...get_rgb());
   c.begin();
   c.set_property("lineWidth", 1000 / get_rgb()[0]);

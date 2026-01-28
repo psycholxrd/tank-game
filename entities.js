@@ -39,7 +39,7 @@ const difficulty_modifiers = {
     projectileSlowness: 0.6,
     bounceTime: 0.9,
     playerHP: 0.95,
-    playerDamage: 0.8,
+    playerDamage: 0.6,
   }
 }
 
@@ -140,8 +140,8 @@ let stats = {
 //player related
 const starting_HP = 500;
 const starting_rFactor = 0.75;
-const starting_damage = 12.5; //old 7.5
-const starting_speed = 45; //old 50
+const starting_damage = 10.5;
+const starting_speed = 45;
 const min_rFactor = 0.4;
 
 //projectile related
@@ -202,7 +202,8 @@ class Player {
     this.speed = 3 / this.rFactor;
   }
   update_damage() {
-    this.damage = 7.5 / this.rFactor;
+    let _difficulty = (difficulty in difficulty_modifiers) ? difficulty : 'normal';
+    this.damage = (starting_damage * difficulty_modifiers[_difficulty].playerDamage) / (this.rFactor * 1.425);
   }
   update_radius() {
     this.r = u * this.rFactor;
