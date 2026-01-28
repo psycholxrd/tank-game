@@ -5,6 +5,7 @@ const chosen_difficulty = document.getElementById("chosen-difficulty");
 const level_selector_cont = document.getElementById("level-selector-container");
 const level_editor_cont = document.getElementById("level-editor-container");
 const game_cont = document.getElementById('game-container');
+const paused_cont = document.getElementById('paused-cont');
 const highscore_text = document.getElementById("highscore");
 const entity_panel = document.getElementById("entity-panel");
 const grid_slider = document.getElementById("grid-intensity");
@@ -15,6 +16,7 @@ const respawn_point = {
   y: u * 7,
 };
 const you = new Player(u / 2, respawn_point.x, respawn_point.y);
+const defaultFPS = 60;
 
 window.addEventListener('resize', (e) => {
   if(!game_active) you.correct_spawn_point;
@@ -171,7 +173,7 @@ function draw_game() {
   }else{
     //update timer
     if(starting_time){
-      const ms_passed = performance.now() - starting_time;
+      const ms_passed = performance.now() - starting_time - total_paused_time;
       setTime(ms_passed);
     }
   }
@@ -189,7 +191,26 @@ function draw_game() {
   apple_collision_check();
   handle_enemy_collision();
 }
-setInterval(draw_game, 1000/60);
+let gameInterval = setInterval(draw_game, 1000/defaultFPS); //make it run for everyone at ~60FPS
+
+function testGameOnHighFPS(type = "safe"){
+  clearInterval(gameInterval);
+  switch (type){
+    case "safe":
+      setInterval(draw_game, 0);
+      break
+    case "agressive":
+      const channel = new MessageChannel();
+      channel.port1.onmessage = () => {
+        draw_game();
+        channel.port2.postMessage(undefined); 
+      };
+      channel.port2.postMessage(undefined);
+      break
+    default:
+      setInterval(draw_game, 1000/defaultFPS);
+  }
+}
 
 function draw_grid(a, b, _c = c, lines = true, text = true) {
   if (_c == c && !debug.grid.active) return;
@@ -486,6 +507,7 @@ function draw_projectiles() {
     proj.update_pos();
     handle_projectile_collision(proj);
     draw_projectile_skin(proj);
+    draw_warn_signal(proj);
     handle_offscreen_projectile(proj);
   }
 }
@@ -1029,10 +1051,42 @@ function loadLevelButtons(){
 }
 loadLevelButtons();
 
+//pause button things
+function pauseGame(){
+  paused_timestamp = performance.now();
+  clearInterval(gameInterval);
+}
+
+function unpauseGame(){
+  total_paused_time += performance.now() - paused_timestamp;
+  gameInterval = setInterval(draw_game, 1000/defaultFPS);
+}
+
+function quitMidGame(){
+  game_completed = false;
+  game_active = false;
+  current_level = 1;
+  enemies.length = 0;
+  apples.length = 0;
+  c.clear();
+  change_screen("menu");
+  paused_cont.style.display = 'none';
+  gameInterval = setInterval(draw_game, 1000/defaultFPS);
+}
+
+function handlePause(){
+  pauseGame();
+  paused_cont.style.display = 'flex';
+}
+
+function handleUnpause(){
+  unpauseGame();
+  paused_cont.style.display = 'none';
+}
+
 //functions for level loading/saving
 function export_level(){
-  window.navigator.clipboard.writeText(JSON.stringify(editor_level));
-  alert('copied!');
+  prompt('Copy this and send it to someone, who wants to import the level.', JSON.stringify(editor_level));
 }
 
 function import_level(){

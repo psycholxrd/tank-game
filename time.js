@@ -114,3 +114,70 @@ class BulletClock{
     requestAnimationFrame(() => {this.handle_dissapearing()});
   }
 }
+
+class WarningClock{
+  constructor(flickeringTime, waitingTime, context){
+    this.fT = flickeringTime;
+    this.wT = waitingTime;
+    this.context = context;
+    this.fTimer = performance.now();
+    this.wTimer = performance.now();
+    this.startedFlickering = false;
+    this.startedWaiting = false;
+  }
+  startFlickering(){
+    this.fTimer = performance.now() + this.fT;
+    this.startedFlickering = true;
+  }
+  get doneFlickering(){
+    return performance.now() > this.fTimer;
+  }
+  startWaiting(){
+    this.wTimer = performance.now() + this.wT;
+    this.startedWaiting = true;
+  }
+  get doneWaiting(){
+    return performance.now() > this.wTimer;
+  }
+  get nextFlickeringState(){
+    switch(this.context.flickeringState){
+      case 1:
+        return 2;
+      case 2:
+        return 1;
+      default:
+        return -1
+    }
+  }
+  get isWarningOver(){
+    return this.context.next.x === this.context.raw.x && this.context.next.y === this.context.raw.y;
+  }
+  restart(){
+    if(!this.isWarningOver){
+      window.requestAnimationFrame(()=>this.restart());
+    }else{
+      //only reset if the next loop started
+      this.startedFlickering = false;
+      this.startedWaiting = false;
+      window.requestAnimationFrame(()=>this.start());
+    }
+  }
+  start(){
+    if(this.isWarningOver) return this.restart();
+    if(!this.startedWaiting) this.startWaiting(); //skip this if already started
+    if(this.doneWaiting){ //wait until starting timer is done
+      if(!this.startedFlickering) this.startFlickering(); //skip this if already started
+      if(this.doneFlickering){ //wait until flickering timer is done
+        //update flickering state upon finishing cycle
+        this.context.flickeringState = this.nextFlickeringState;
+        //restart flickering
+        this.startedFlickering = false;
+        window.requestAnimationFrame(()=>this.start()); //using requestAnimationFrame to prevent recursion memory overflow
+      }else{
+        window.requestAnimationFrame(()=>this.start());
+      }
+    }else{
+      window.requestAnimationFrame(()=>this.start());
+    }
+  }
+}

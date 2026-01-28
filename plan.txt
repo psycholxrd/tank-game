@@ -1,8 +1,8 @@
-1. Implement a level editor. (√)
-   - make apples render (√)
-   - add scale slider (√)
-   - add return to menu button (√)
-2. Simplify skin drawing process (√)
+1. Implement a level editor. √
+   - make apples render √
+   - add scale slider √
+   - add return to menu button √
+2. Simplify skin drawing process √
 3. Add Pause button
 4. Add Game finished screen
 5. Add window. functions

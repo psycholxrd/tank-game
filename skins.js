@@ -122,6 +122,25 @@ let skin_colors = {
     target_line: "red",
     target_circle: "yellow",
   },
+  //Extra
+  "Warning-1": { //this should not appear
+    outline: "pink",
+    inside: "pink",
+    messageFill: "pink",
+    messageStroke: "pink",
+  },
+  Warning1: {
+    outline: "orange",
+    inside: "yellow",
+    messageFill: "red",
+    messageStroke: "red",
+  },
+  Warning2: {
+    outline: "white",
+    inside: "black",
+    messageFill: "white",
+    messageStroke: "white",
+  },
   //debug
   default: {
     test: "green",
@@ -411,13 +430,14 @@ function draw_enemy_skin(Enemy, _c = c) {
             [2, 16],
             [5, 16],
             [5, 21],
-            [2, 21]
+            [2, 21],
           ]);
           strokePath16(skin_colors[Enemy.type].left_arm_outer, [
             [2, 16],
             [5, 16],
             [5, 21],
-            [2, 21]
+            [2, 21],
+            [2, 16]
           ]);
           strokePath16(skin_colors[Enemy.type].left_arm_outer, [
             [3, 20],
@@ -477,7 +497,8 @@ function draw_enemy_skin(Enemy, _c = c) {
             [11, 16],
             [14, 16],
             [14, 21],
-            [11, 21]
+            [11, 21],
+            [11, 16],
           ]);
           strokePath16(skin_colors[Enemy.type].right_arm_outer, [
             [12, 20],
@@ -1011,4 +1032,38 @@ function draw_projectile_skin(projectile) {
   c.arc(projectile.x, projectile.y, projectile.r, 0, 2 * Math.PI);
   c.fill();
   */
+}
+
+function draw_warn_signal(projectile){
+  if(projectile.direction === 0 && projectile.next && projectile.next.x && projectile.next.y && projectile.next.x != projectile.raw.x && projectile.next.y != projectile.raw.y){
+    let _x = projectile.next.x;
+    let _y = projectile.next.y;
+    let x = _x*u;
+    let y = _y*u;
+    let state = projectile.flickeringState;
+    c.begin();
+    c.set_property("fillStyle", skin_colors[`Warning${state}`].inside);
+    c.moveTo(x, y-(projectile.r*2));
+    c.lineTo(x-projectile.r, y);
+    c.lineTo(x+projectile.r, y);
+    c.fill();
+
+    c.begin();
+    c.set_property("strokeStyle", skin_colors[`Warning${state}`].outline);
+    c.moveTo(x, y-(projectile.r*2));
+    c.lineTo(x-projectile.r, y);
+    c.lineTo(x+projectile.r, y);
+    c.ctx.closePath();
+    c.stroke();
+
+    c.begin();
+    c.set_property("textAlign", "center");
+    c.set_property("fillStyle", skin_colors[`Warning${state}`].messageFill);
+    c.fillText('!', x, y, projectile.r/40);
+
+    c.begin();
+    c.set_property("textAlign", "center");
+    c.set_property("strokeStyle", skin_colors[`Warning${state}`].messageStroke);
+    c.strokeText('!', x, y, projectile.r/40);
+  }
 }

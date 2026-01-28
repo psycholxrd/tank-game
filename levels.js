@@ -1,6 +1,8 @@
 const final_level = 10;
 let starting_time;
 let final_time;
+let paused_timestamp;
+let total_paused_time = 0;
 let game_completed = false;
 let game_active = false;
 let current_level = 1;
@@ -245,7 +247,7 @@ function load_level(number) {
     starting_time = performance.now();
   }
   if(number == final_level){
-    final_time = performance.now()-starting_time;
+    final_time = performance.now()-starting_time-total_paused_time;
     let last_best = localStorage.getItem('[Tanks] BestTime');
     if(last_best){
       let parsed = JSON.parse(last_best);

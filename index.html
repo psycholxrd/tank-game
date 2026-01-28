@@ -19,6 +19,12 @@
       <div id = "game-container">
         <div id = "timer">00:00:00</div>
         <canvas id="canvas"></canvas>
+        <button id = "pause-btn" onclick=handlePause()>||</button>
+        <div id = "paused-cont">
+          <div id = "dimmer"></div>
+          <div class = "paused-btn" onclick = handleUnpause()>Resume</div>
+          <div class = "paused-btn" onclick = quitMidGame()>Return to title</div>
+        </div>
       </div>
       <div id = "difficulty-container">
         <b class = "difficulty-text">Select Difficulty:</b>

@@ -137,11 +137,15 @@ let stats = {
   }
 }
 
+//player related
 const starting_HP = 500;
 const starting_rFactor = 0.75;
 const starting_damage = 12.5; //old 7.5
 const starting_speed = 45; //old 50
 const min_rFactor = 0.4;
+
+//projectile related
+const teleportCoolDownTime = 1500;
 
 class Player {
   constructor(radius, start_x, start_y) {
@@ -292,13 +296,21 @@ class Enemy {
 class Projectile {
   constructor(type, direction, raw_coords, rFactor, rScale, damage, bouncy = false, bounceTime = 10000, wavy = false, frequency = 1, amplitude = 1) {
     this.raw = raw_coords;
+    this.next = {
+      x: this.raw.x,
+      y: this.raw.y
+    };
     this.direction = direction; //{0}not moving {1}up, {2}right-up, {3}right, {4}right-down, {5}down, {6}left-down, {7}left, {8}left-up
     this.rFactor = rFactor;
     this.rScale = rScale;
     this.type = type;
     this.speed = 0;
     this.damage = damage;
-    this.teleportCooldown = new RandomAreaCooldown(1500);
+    this.teleportCooldown = new RandomAreaCooldown(teleportCoolDownTime);
+    //warning logic
+    this.flickeringState = 1;
+    this.warningClock = new WarningClock(teleportCoolDownTime/3, teleportCoolDownTime/30, this);
+    this.warningClock.start();
     this.x, this.y, this.r;
     //bounce logic
     this.bouncy = bouncy;
@@ -339,15 +351,16 @@ class Projectile {
     }
     if(this.wavy) define_wave();
 
-    //0 needs a cooldown
     let instructions = {
       0: () => {
         if (this.teleportCooldown.canTeleport()) {
-          this.raw.x =
+          this.raw.x = this.next.x;
+          this.raw.y = this.next.y;
+          this.next.x =
             Math.floor(
               Math.random() * (random_area.end_x - random_area.start_x)
             ) + random_area.start_x;
-          this.raw.y =
+          this.next.y =
             Math.floor(
               Math.random() * (random_area.end_y - random_area.start_y)
             ) + random_area.start_y;
