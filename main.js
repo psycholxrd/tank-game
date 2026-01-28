@@ -1063,6 +1063,7 @@ function unpauseGame(){
 }
 
 function quitMidGame(){
+  total_paused_time = 0;
   game_completed = false;
   game_active = false;
   current_level = 1;
