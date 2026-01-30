@@ -7,12 +7,16 @@ class Clock {
     this._expiresAt = {
       enemy_knock_damage: 0,
       shoot_enemy: 0,
+      snipe_enemy: 0,
+      switch_weapon: 0,
     };
 
     this.cd = {
       default: {
         enemy_knock_damage: old60FPSCooldownToMilliseconds(40),
         shoot_enemy: old60FPSCooldownToMilliseconds(25),
+        snipe_enemy: old60FPSCooldownToMilliseconds(70),
+        switch_weapon: old60FPSCooldownToMilliseconds(500),
       },
 
       locked: {
@@ -21,6 +25,12 @@ class Clock {
         },
         get shoot_enemy() {
           return performance.now() < this._parent._expiresAt.shoot_enemy;
+        },
+        get snipe_enemy() {
+          return performance.now() < this._parent._expiresAt.snipe_enemy;
+        },
+        get switch_weapon() {
+          return performance.now() < this._parent._expiresAt.switch_weapon;
         },
         _parent: this
       },
@@ -31,6 +41,12 @@ class Clock {
         },
         get shoot_enemy() {
           return Math.max(0, this._parent._expiresAt.shoot_enemy - performance.now());
+        },
+        get snipe_enemy() {
+          return Math.max(0, this._parent._expiresAt.snipe_enemy - performance.now());
+        },
+        get switch_weapon() {
+          return Math.max(0, this._parent._expiresAt.switch_weapon - performance.now());
         },
         _parent: this
       }
@@ -46,6 +62,18 @@ class Clock {
   shoot_enemy() {
     if (!this.cd.locked.shoot_enemy) {
       this._expiresAt.shoot_enemy = performance.now() + this.cd.default.shoot_enemy;
+    }
+  }
+
+  snipe_enemy(){
+    if (!this.cd.locked.snipe_enemy) {
+      this._expiresAt.snipe_enemy = performance.now() + this.cd.default.snipe_enemy;
+    }
+  }
+
+  switch_weapon(){
+    if (!this.cd.locked.switch_weapon) {
+      this._expiresAt.switch_weapon = performance.now() + this.cd.default.switch_weapon;
     }
   }
 }
@@ -154,7 +182,7 @@ class WarningClock{
     }
   }
   get isWarningOver(){
-    return this.context.next.x === this.context.raw.x && this.context.next.y === this.context.raw.y;
+    return this.context.next.x === this.context.unscaled.x && this.context.next.y === this.context.unscaled.y;
   }
   restart(){
     if(!this.isWarningOver){

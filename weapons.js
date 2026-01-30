@@ -67,12 +67,20 @@ class Laser extends Weapon{
 class Sniper extends Weapon{
     constructor(owner){
         super('Sniper', 0, 'snipe_enemy', owner);
-        this.vector = new Vector2D([this.owner.x, this.owner.y], [mouse.x, mouse.y]);
-        this.bullet_start = this.vector.end;
-        this.bullet_direction = this.vector.raw;
+        let [x, y] = (this.owner.x !== undefined && this.owner.y !== undefined) ? [this.owner.x, this.owner.y] : [0, 0];
+        this.vector = new Vector2D([x, y], [mouse.x, mouse.y]);
+    }
+    get bullet_start(){
+        return this.vector.unscaledEnd;
+    }
+    get bullet_direction(){
+        return this.vector.unscaledRaw;
     }
     update_vector(){
-        this.vector.start = [this.owner.x, this.owner.y];
+        if(this.owner.x !== undefined && this.owner.y !== undefined){
+            this.vector.start[0] = this.owner.x;
+            this.vector.start[1] = this.owner.y;
+        }
         this.vector.end = [mouse.x, mouse.y];
     }
     draw(){

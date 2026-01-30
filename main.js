@@ -13,10 +13,15 @@ const respawn_point = {
   x: u * 2,
   y: u * 7,
 };
-const you = new Player(u / 2, respawn_point.x, respawn_point.y, "Sniper");
+const you = new Player(u / 2, respawn_point.x, respawn_point.y, "Laser");
 const laser = new Laser(you);
 const sniper = new Sniper(you);
 const defaultFPS = 60;
+
+let active_screen = 'menu';
+let weapon_img = new Image();
+let set_weapon_src = () => weapon_img.src = `weapons/${clock.cd.locked.switch_weapon ? 'disabled' : 'enabled'}_${you.selected_weapon}.png`;
+set_weapon_src();
 
 window.addEventListener('resize', (e) => {
   if(!game_active) you.correct_spawn_point;
@@ -38,6 +43,15 @@ function getDist(x1, y1, x2, y2){
   return Math.hypot(x2-x1, y2-y1);
 }
 
+function isCircleInRectangle(cx, cy, cr, rx, ry, rw, rh){
+  let closestX = Math.max(rx, Math.min(cx, rx+rw));
+  let closestY = Math.max(ry, Math.min(cy, ry+rh));
+  let dx = cx - closestX;
+  let dy = cy - closestY;
+  let distanceSquared = dx * dx + dy * dy;
+  return (distanceSquared <= cr * cr);
+}
+
 function msToTime(ms){
   const minutes = Math.floor(ms / 60000);
   const seconds = Math.floor((ms % 60000) / 1000);
@@ -56,24 +70,6 @@ function updateHighscoreText(){
 }
 updateHighscoreText();
 
-function create_apples(amount) {
-  for (let i = 0; i < amount; i++) {
-    let x = Math.floor(Math.random() * 16) + 1;
-    let y = Math.floor(Math.random() * 9) + 1;
-    let apple = new Apple(x, y);
-    apples.push(apple);
-  }
-}
-
-function create_enemies(amount) {
-  for (let i = 0; i < amount; i++) {
-    let x = Math.floor(Math.random() * 16) + 1;
-    let y = Math.floor(Math.random() * 9) + 1;
-    let enemy = new Enemy(x, y, 0.5, 0.5);
-    enemies.push(enemy);
-  }
-}
-
 function apple_collision_check() {
   for (apple in apples) {
     let curr = apples[apple];
@@ -87,46 +83,29 @@ function apple_collision_check() {
   }
 }
 
-function enemy_collision_check() {
+function enemy_player_collision_check() {
   for (let i = 0; i < enemies.length; i++) {
     let curr = enemies[i];
-
-    // Ensure enemy dimensions are updated
     curr.update_values();
+    let result = isCircleInRectangle(you.x, you.y, you.r, curr.x, curr.y, curr.w, curr.h);
+    if(result) return true;
+  }
+  return false;
+}
 
-    // Player properties
-    let px = you.x;
-    let py = you.y;
-    let pr = you.r;
-
-    // Enemy properties
-    let ex = curr.x;
-    let ey = curr.y;
-    let ew = curr.w;
-    let eh = curr.h;
-
-    // Find the closest point on the rectangle to the circle
-    let closestX = Math.max(ex, Math.min(px, ex + ew));
-    let closestY = Math.max(ey, Math.min(py, ey + eh));
-
-    // Calculate the distance between the circle's center and this closest point
-    let dx = px - closestX;
-    let dy = py - closestY;
-    let distanceSquared = dx * dx + dy * dy;
-
-    // Collision check
-    if (distanceSquared <= pr * pr) {
-      return true;
-    }
+function player_projectile_collision_check(enemy){
+  for(let pp of player_projectiles){
+    let result = isCircleInRectangle(pp.x, pp.y, pp.r, enemy.x, enemy.y, enemy.w, enemy.h);
+    if(result) return true;
   }
   return false;
 }
 
 function handle_enemy_collision() {
-  let coll = enemy_collision_check();
+  let coll = enemy_player_collision_check();
   if (coll && !clock.cd.locked.enemy_knock_damage) {
     clock.enemy_knock_damage();
-    you.hp -= 150;
+    you.hp -= enemy_knock_damage;
   }
   if (clock.cd.locked.enemy_knock_damage) {
     you.activeColor = you.damageColor;
@@ -137,10 +116,77 @@ function handle_enemy_collision() {
 
 //player drawing
 const img = new Image();
-const set_source = () => img.src = `images/level ${current_level}.png`;
+const set_source = () => img.src = `level_backgrounds/level ${current_level}.png`;
 
 function setTime(ms){
   timer.innerHTML = msToTime(ms);
+}
+
+function delete_player_projectile(projectile){
+  let i = player_projectiles.indexOf(projectile);
+  player_projectiles.splice(i, 1);
+}
+
+function handle_offscreen_player_projectile(projectile) {
+  let {x, y} = projectile.pos;
+  if (
+    x > pigeon.el.width ||
+    x < 0 ||
+    y > pigeon.el.height ||
+    y < 0
+  ) {
+    delete_player_projectile(projectile);
+  }
+}
+
+function apply_snipe_enemy(){
+  let proj = new PlayerProjectile('Snipe', sniper.bullet_start, sniper.bullet_direction, you.rFactor*9, (you.damage / you.rFactor) * 4, you.rFactor*0.5);
+  player_projectiles.push(proj);
+  clock[sniper.reloadKey]();
+}
+
+function update_player_projectiles(){
+  player_projectiles.forEach((proj) => {
+    proj.step();
+    handle_offscreen_player_projectile(proj);
+  });
+}
+
+function draw_player_projectiles(){
+  player_projectiles.forEach(proj => proj.draw());
+}
+
+function handle_player_projectile_collision(){
+  for(let e of enemies){
+    for(let pp of player_projectiles){
+      let result = isCircleInRectangle(pp.pos.x, pp.pos.y, pp.radius, e.x, e.y, e.w, e.h);
+      if(result){
+        e.hp -= pp.damage;
+        e.damage_active = true;
+        e.enemyColor = skin_colors[e.type].damaged_body;
+        setTimeout(() => {
+          e.damage_active = false;
+        }, 150);
+        delete_player_projectile(pp);
+      }
+    }
+  }
+}
+
+function player_anti_stuck(){
+  const steps = 25;
+  if(pigeon.el.height < (you.y+you.r)){
+    you.unscaled.y-=steps;
+  }
+  if((you.y-you.r) < 0){
+    you.unscaled.y+=steps;
+  }
+  if(pigeon.el.width < (you.x+you.r)){
+    you.unscaled.x-=steps;
+  }
+  if((you.x-you.r) < 0){
+    you.unscaled.x+=steps;
+  }
 }
 
 //functions
@@ -161,6 +207,8 @@ function draw_game() {
   c.begin();
   c.ctx.drawImage(img, 0, 0, pigeon.w, pigeon.h);
   draw_tank();
+  update_player_projectiles();
+  draw_player_projectiles();
   draw_grid(debug.grid.a, debug.grid.b);
   check_dead_enemies();
   draw_projectiles();
@@ -168,6 +216,8 @@ function draw_game() {
   draw_apples();
   apple_collision_check();
   handle_enemy_collision();
+  handle_player_projectile_collision();
+  player_anti_stuck();
 }
 let gameInterval = setInterval(draw_game, 1000/defaultFPS); //make it run for everyone at ~60FPS
 
@@ -241,6 +291,24 @@ function draw_tank() {
   c.set_property("strokeStyle", "darkorange");
   c.set_property("lineWidth", 2.5);
   c.stroke();
+
+  //draw weapon cooldown
+  set_weapon_src();
+  const wpn_width = you.r;
+  const wpn_height = you.r;
+  const wpn_x = you.x - (wpn_width/2);
+  const wpn_y = you.y - (you.r*2.5);
+  c.begin();
+  c.ctx.drawImage(weapon_img, wpn_x, wpn_y, wpn_width, wpn_height);
+
+  c.begin();
+  c.set_property('fillStyle', 'black');
+  c.set_property('globalAlpha', 0.25);
+  let _100percent = wpn_height;
+  let _current_percent = (clock.cd.current.switch_weapon / clock.cd.default.switch_weapon) * 100;
+  let new_height = (_100percent / 100) * _current_percent;
+  c.fillRect(wpn_x, (wpn_y + wpn_height) - new_height, wpn_width, new_height);
+  c.set_property('globalAlpha', 1);
 
   //hp bar
   let hp_bar = {
@@ -323,11 +391,11 @@ function draw_enemies() {
       y: enemy.y - (enemy.h/3),
     }
     let full = enemy.w;
-    let get_percent = () => enemy.hp/((enemy.raw.w + enemy.raw.h) * 100);
+    let get_percent = () => enemy.hp/((enemy.unscaled.w + enemy.unscaled.h) * 100);
 
     c.begin();
     c.set_property('lineCap', 'round');
-    c.set_property("lineWidth", 0.17 * u);
+    c.set_property("lineWidth", (0.17*(enemy.w/100)) * u);
     c.set_property("strokeStyle", "black");
     c.moveTo(hp_bar.x, hp_bar.y);
     c.lineTo(hp_bar.x + (full), hp_bar.y);
@@ -336,7 +404,7 @@ function draw_enemies() {
     
     c.begin();
     c.set_property('lineCap', 'round');
-    c.set_property("lineWidth", 0.14 * u);
+    c.set_property("lineWidth", (0.14*(enemy.w/100)) * u);
     c.set_property("strokeStyle", "red");
     c.moveTo(hp_bar.x, hp_bar.y);
     c.lineTo(hp_bar.x + (get_percent()*full), hp_bar.y);
@@ -387,8 +455,8 @@ function create_projectiles(enemy) {
     let proj = new Projectile(
       enemy.projectile_type,
       dir,
-      { x: enemy.raw.x + enemy.raw.w / 2, y: enemy.raw.y + enemy.raw.h / 2 },
-      enemy.raw.w / 4,
+      { x: enemy.unscaled.x + enemy.unscaled.w / 2, y: enemy.unscaled.y + enemy.unscaled.h / 2 },
+      enemy.unscaled.w / 4,
       enemy.p_rscale,
       enemy.pdamage,
       enemy.pbouncy,
@@ -618,6 +686,9 @@ document.addEventListener("mousedown", (e) => {
     case "Laser":
       if (!clock.cd.locked[laser.reloadKey]) apply_shoot_enemy(e.clientX, e.clientY);
       break
+    case "Sniper":
+      if (!clock.cd.locked[sniper.reloadKey] && active_screen === "game") apply_snipe_enemy();
+      break;
   }
 });
 
@@ -644,7 +715,6 @@ const screen_containers = {
   'game-completed': {},
 };
 
-let active_screen = 'menu';
 function change_screen(new_screen){
   if(!allowed_screens.includes(new_screen)) return console.warn(new_screen + ' is not allowed!');
   screen_containers[active_screen].style.display = 'none';
@@ -1063,8 +1133,8 @@ function spawn_player() {
   you.rFactor = starting_rFactor;
   you.damage = starting_damage;
   you.speed = starting_speed;
-  you.raw.x = respawn_point.x;
-  you.raw.y = respawn_point.y;
+  you.unscaled.x = respawn_point.x;
+  you.unscaled.y = respawn_point.y;
 }
 function apply_death() {
   load_level(current_level);

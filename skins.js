@@ -1,5 +1,3 @@
-let boss_types = ["Ice Wizard", "Cry Baby", "Mega Org"];
-let slave_types = ["Frosty", "Crier", "Org"];
 let skin_colors = {
   //Enemies
   "Ice Wizard": {
@@ -1035,7 +1033,7 @@ function draw_projectile_skin(projectile) {
 }
 
 function draw_warn_signal(projectile){
-  if(projectile.direction === 0 && projectile.next && projectile.next.x && projectile.next.y && projectile.next.x != projectile.raw.x && projectile.next.y != projectile.raw.y){
+  if(projectile.direction === 0 && projectile.next && projectile.next.x && projectile.next.y && projectile.next.x != projectile.unscaled.x && projectile.next.y != projectile.unscaled.y){
     let _x = projectile.next.x;
     let _y = projectile.next.y;
     let x = _x*u;

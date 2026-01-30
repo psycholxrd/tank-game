@@ -1,151 +1,3 @@
-/*
-EXPLANATION:
-- projectile_directions has 1 for allowed direction and 0 for disallowed. The index represents a direction
-- last_direction potentially useless
-- projectile_type not only determines skin, but also effect (like freezing)
-- damage just raw damage number dealt to the player when hit by projectile
-- cooldown basically shooting cooldown in milliseconds (or frames I don't remember)
-- projectileSlowness higher value makes projectiles fly slower
-- isBouncy when true, reverses the direction of the projectile when touching the border
-- bounceTime how long can a projectile live before despawning
-- isWavy when true, moves in sinus/cosinus curves
-- frequency how close the waves are to each other
-- amplitude how big are the waves
-*/
-let difficulty = 'normal';
-
-const difficulty_modifiers = {
-  'easy': {
-    damage: 0.6,
-    cooldown: 3.5,
-    projectileSlowness: 3,
-    bounceTime: 0.55,
-    playerHP: 1.25,
-    playerDamage: 3,
-  },
-  'normal': {
-    damage: 1,
-    cooldown: 1,
-    projectileSlowness: 1,
-    bounceTime: 1,
-    playerHP: 1,
-    playerDamage: 1,
-  },
-  'hard': {
-    damage: 1.25,
-    cooldown: 0.7,
-    projectileSlowness: 0.6,
-    bounceTime: 0.9,
-    playerHP: 0.95,
-    playerDamage: 0.6,
-  }
-}
-
-let stats = {
-  'Ice Wizard': {
-    projectile_directions: [0, 1, 1, 1, 1, 1, 1, 1, 1],
-    last_direction: 1,
-    projectile_type: 'Freeze',
-    damage: 150,
-    cooldown: 1000,
-    projectileSlowness: 5,
-    isBouncy: false,
-    bounceTime: 0,
-    isWavy: false,
-    frequency: 0,
-    amplitude: 0,
-  },
-  'Cry Baby': {
-    projectile_directions: [0, 0, 0, 0, 1, 0, 1, 0, 0],
-    last_direction: 4,
-    projectile_type: 'BigTear',
-    damage: 175,
-    cooldown: 1750,
-    projectileSlowness: 7,
-    isBouncy: true,
-    bounceTime: 10000,
-    isWavy: false,
-    frequency: 1,
-    amplitude: 1,
-  },
-  'Mega Org': {
-    projectile_directions: [1, 0, 0, 0, 0, 0, 0, 0, 0],
-    last_direction: 0,
-    projectile_type: 'BigSnipe',
-    damage: 400,
-    cooldown: 3750,
-    projectileSlowness: 5,
-    isBouncy: false,
-    bounceTime: 0,
-    isWavy: false,
-    frequency: 1,
-    amplitude: 1,
-  },
-  'Frosty': {
-    projectile_directions: [0, 1, 0, 1, 0, 1, 0, 1, 0],
-    last_direction: 1,
-    projectile_type: 'Arrow',
-    damage: 100,
-    cooldown: 875,
-    projectileSlowness: 4,
-    isBouncy: false,
-    bounceTime: 0,
-    isWavy: false,
-    frequency: 1,
-    amplitude: 1,
-  },
-  'Crier': {
-    projectile_directions: [0, 0, 0, 0, 0, 1, 0, 0, 0],
-    last_direction: 5,
-    projectile_type: 'Tear',
-    damage: 175,
-    cooldown: 1100,
-    projectileSlowness: 2,
-    isBouncy: false,
-    bounceTime: 0,
-    isWavy: false,
-    frequency: 1,
-    amplitude: 1,
-  },
-  'Org': {
-    projectile_directions: [1, 0, 0, 0, 0, 0, 0, 0, 0],
-    last_direction: 0,
-    projectile_type: 'Snipe',
-    damage: 250,
-    cooldown: 5000,
-    projectileSlowness: 5,
-    isBouncy: false,
-    bounceTime: 0,
-    isWavy: false,
-    frequency: 1,
-    amplitude: 1,
-  },
-  'Default': {
-    projectile_directions: [0, 0, 0, 0, 0, 0, 0, 0, 0],
-    last_direction: 0,
-    projectile_type: 'Arrow',
-    damage: 250,
-    cooldown: 1000,
-    projectileSlowness: 5,
-    isBouncy: false,
-    bounceTime: 0,
-    isWavy: false,
-    frequency: 1,
-    amplitude: 1,
-  }
-}
-
-//player related
-const weapon_types = ["Laser", "Sniper"];
-const starting_HP = 500;
-const starting_rFactor = 0.75;
-const starting_damage = 10.5;
-const starting_speed = 45;
-const min_rFactor = 0.4;
-
-//projectile related
-const teleportCoolDownTime = 1500;
-
 class Player {
   constructor(radius, start_x, start_y, selected_weapon = "Laser") {
     let _difficulty = (difficulty in difficulty_modifiers) ? difficulty : 'normal';
@@ -155,7 +7,7 @@ class Player {
     this.damage = starting_damage * difficulty_modifiers[_difficulty].playerDamage;
     this.r = radius;
     this._rFactor = starting_rFactor;
-    this.raw = {
+    this.unscaled = {
       x: start_x,
       y: start_y,
     };
@@ -168,6 +20,11 @@ class Player {
     this.freezeColor = "blue";
     this.activeColor = this.playerColor;
     this.color = "rgb(0, 0, 0)"; //line color
+    window.addEventListener('keydown', (e) => {
+      if(e.code === "ShiftLeft" || e.code === "ShiftRight"){
+        this.switch_weapon();
+      }
+    })
   }
   //limitations
   set hp(value){
@@ -183,9 +40,15 @@ class Player {
   get rFactor(){
     return this._rFactor;
   }
+  switch_weapon(){
+    if(!clock.cd.locked.switch_weapon){
+      this.selected_weapon = weapon_types[(weapon_types.indexOf(this.selected_weapon)+1) % weapon_types.length];
+      clock.switch_weapon();
+    }
+  }
   correct_spawn_point(){
-    this.raw.x = u * 2;
-    this.raw.y = u * 7;
+    this.unscaled.x = u * 2;
+    this.unscaled.y = u * 7;
   }
   update_pos() {
     if(this.xOffset != 0 && this.yOffset != 0){
@@ -193,10 +56,10 @@ class Player {
       this.xOffset = neg_sqrt(this.xOffset);
       this.yOffset = neg_sqrt(this.yOffset);
     }
-    this.raw.x += this.xOffset * this.speed;
-    this.raw.y += this.yOffset * this.speed;
-    this.x = (this.raw.x * u) / 100;
-    this.y = (this.raw.y * u) / 100;
+    this.unscaled.x += this.xOffset * this.speed;
+    this.unscaled.y += this.yOffset * this.speed;
+    this.x = (this.unscaled.x * u) / 100;
+    this.y = (this.unscaled.y * u) / 100;
   }
 
   update_speed() {
@@ -219,7 +82,7 @@ class Apple {
     this.unit = unit;
     this.r = 1;
     this.rFactor = rFactor;
-    this.raw = {
+    this.unscaled = {
       x: x,
       y: y,
     };
@@ -229,8 +92,8 @@ class Apple {
   update_values() {
     let unit = this.unit === 'u' ? u : this.unit === 'u2' ? u2 : 1;
     this.r = this.rFactor * unit;
-    this.x = this.raw.x * unit;
-    this.y = this.raw.y * unit;
+    this.x = this.unscaled.x * unit;
+    this.y = this.unscaled.y * unit;
   }
 }
 
@@ -245,7 +108,7 @@ class Enemy {
     this.is_Boss = false;
     this.is_Slave = false;
     this.type = (type in stats) ? type : 'Default';
-    this.raw = {
+    this.unscaled = {
       x: x,
       y: y,
       w: w,
@@ -270,10 +133,10 @@ class Enemy {
   }
   update_values() {
     let unit = this.unit === 'u' ? u : this.unit === 'u2' ? u2 : 1;
-    this.x = this.raw.x * unit;
-    this.y = this.raw.y * unit;
-    this.w = this.raw.w * unit;
-    this.h = this.raw.h * unit;
+    this.x = this.unscaled.x * unit;
+    this.y = this.unscaled.y * unit;
+    this.w = this.unscaled.w * unit;
+    this.h = this.unscaled.h * unit;
     this.corners = {
       lu: {
         x: this.x,
@@ -296,11 +159,11 @@ class Enemy {
 }
 
 class Projectile {
-  constructor(type, direction, raw_coords, rFactor, rScale, damage, bouncy = false, bounceTime = 10000, wavy = false, frequency = 1, amplitude = 1) {
-    this.raw = raw_coords;
+  constructor(type, direction, unscaled_coords, rFactor, rScale, damage, bouncy = false, bounceTime = 10000, wavy = false, frequency = 1, amplitude = 1) {
+    this.unscaled = unscaled_coords;
     this.next = {
-      x: this.raw.x,
-      y: this.raw.y
+      x: this.unscaled.x,
+      y: this.unscaled.y
     };
     this.direction = direction; //{0}not moving {1}up, {2}right-up, {3}right, {4}right-down, {5}down, {6}left-down, {7}left, {8}left-up
     this.rFactor = rFactor;
@@ -344,10 +207,10 @@ class Projectile {
 
     let define_wave = () => {
       let instructions = {
-        1: () => wave.y = Math.sin(this.raw.y * this.frequency) * this.amplitude * u,
-        3: () => wave.x = Math.cos(this.raw.x * this.frequency) * this.amplitude * u,
-        5: () => wave.y = Math.sin(this.raw.y * this.frequency) * this.amplitude * u,
-        7: () => wave.x = Math.cos(this.raw.x * this.frequency) * this.amplitude * u
+        1: () => wave.y = Math.sin(this.unscaled.y * this.frequency) * this.amplitude * u,
+        3: () => wave.x = Math.cos(this.unscaled.x * this.frequency) * this.amplitude * u,
+        5: () => wave.y = Math.sin(this.unscaled.y * this.frequency) * this.amplitude * u,
+        7: () => wave.x = Math.cos(this.unscaled.x * this.frequency) * this.amplitude * u
       };
       instructions[this.direction]();
     }
@@ -356,8 +219,8 @@ class Projectile {
     let instructions = {
       0: () => {
         if (this.teleportCooldown.canTeleport()) {
-          this.raw.x = this.next.x;
-          this.raw.y = this.next.y;
+          this.unscaled.x = this.next.x;
+          this.unscaled.y = this.next.y;
           this.next.x =
             Math.floor(
               Math.random() * (random_area.end_x - random_area.start_x)
@@ -369,36 +232,83 @@ class Projectile {
         }
       },
       1: () => {
-        this.raw.y -= this.speed;
+        this.unscaled.y -= this.speed;
       },
       2: () => {
-        this.raw.x += this.speed;
-        this.raw.y -= this.speed;
+        this.unscaled.x += this.speed;
+        this.unscaled.y -= this.speed;
       },
       3: () => {
-        this.raw.x += this.speed;
+        this.unscaled.x += this.speed;
       },
       4: () => {
-        this.raw.x += this.speed;
-        this.raw.y += this.speed;
+        this.unscaled.x += this.speed;
+        this.unscaled.y += this.speed;
       },
       5: () => {
-        this.raw.y += this.speed;
+        this.unscaled.y += this.speed;
       },
       6: () => {
-        this.raw.x -= this.speed;
-        this.raw.y += this.speed;
+        this.unscaled.x -= this.speed;
+        this.unscaled.y += this.speed;
       },
       7: () => {
-        this.raw.x -= this.speed;
+        this.unscaled.x -= this.speed;
       },
       8: () => {
-        this.raw.x -= this.speed;
-        this.raw.y -= this.speed;
+        this.unscaled.x -= this.speed;
+        this.unscaled.y -= this.speed;
       },
     };
     instructions[this.direction]();
-    this.x = this.raw.x * u + wave.y;
-    this.y = this.raw.y * u + wave.x;
+    this.x = this.unscaled.x * u + wave.y;
+    this.y = this.unscaled.y * u + wave.x;
+  }
+}
+
+class PlayerProjectile{
+  constructor(type, starting_point, direction_vector, speed, damage, radius){
+    if(isNaN(starting_point[0]) || isNaN(starting_point[1]) || isNaN(direction_vector[0]) || isNaN(direction_vector[1])) throw new Error('NAN detected in PlayerProjectile');
+    let _type = player_projectile_types.includes(type) ? type : 'Snipe';
+    this.type = _type;
+    this.unscaled_starting_point = starting_point;
+    this.unscaled_direction_vector = direction_vector;
+    this.unscaled_speed = speed;
+    this.unscaled_radius = radius;
+    this.damage = damage;
+    this.steps = 0;
+    this.unscaled_pos = {
+      x: this.unscaled_starting_point[0],
+      y: this.unscaled_starting_point[1]
+    };
+  }
+  get starting_point(){
+    let [x, y] = this.unscaled_starting_point;
+    return [x*u, y*u];
+  }
+  get direction_vector(){
+    let [x, y] = this.direction_vector;
+    return [x*u, y*u];
+  }
+  get speed(){
+    return this.unscaled_speed * u;
+  }
+  get radius(){
+    return this.unscaled_radius * u;
+  }
+  get pos(){
+    return {
+      x: (this.unscaled_pos.x + (this.unscaled_direction_vector[0] / this.unscaled_speed * this.steps)) * u,
+      y: (this.unscaled_pos.y + (this.unscaled_direction_vector[1] / this.unscaled_speed * this.steps)) * u
+    };
+  }
+  step(){
+    this.steps++;
+  }
+  draw(){
+    c.begin();
+    c.set_property('fillStyle', 'white');
+    c.arc(this.pos.x, this.pos.y, this.radius, 0, Math.PI*2);
+    c.fill();
   }
 }

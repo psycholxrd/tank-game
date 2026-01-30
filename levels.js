@@ -9,6 +9,7 @@ let current_level = 1;
 let apples = [];
 let enemies = [];
 let projectiles = [];
+let player_projectiles = [];
 let proj_timers = [];
 let default_levels = {
   //apple syntax: [x, y, radius] enemy syntax: [x, y, side length on grid 16x9, boss or slave, type]
@@ -268,6 +269,7 @@ function load_level(number) {
   apples = [];
   enemies = [];
   projectiles = [];
+  player_projectiles = [];
   proj_timers = [];
   game_active = true;
   current_level = number;
