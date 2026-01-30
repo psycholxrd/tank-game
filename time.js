@@ -50,6 +50,8 @@ class Clock {
   }
 }
 
+const clock = new Clock(); //define this globally
+
 class RandomAreaCooldown {
   constructor(cooldown_ms) {
     this.cooldown = cooldown_ms;
@@ -82,6 +84,7 @@ class ProjClock {
   }
 }
 
+const freezing_time = 250;
 class FreezeClock{
   constructor(wait_ms){
     this.wait_ms = wait_ms;
@@ -95,6 +98,7 @@ class FreezeClock{
     return performance.now() <= this.timer;
   }
 }
+const freezeClock = new FreezeClock(freezing_time); //define this globally
 
 class BulletClock{
   constructor(living_time, context){

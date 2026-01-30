@@ -1,5 +1,3 @@
-const freezing_time = 250;
-
 /*
 EXPLANATION:
 - projectile_directions has 1 for allowed direction and 0 for disallowed. The index represents a direction
@@ -138,6 +136,7 @@ let stats = {
 }
 
 //player related
+const weapon_types = ["Laser", "Sniper"];
 const starting_HP = 500;
 const starting_rFactor = 0.75;
 const starting_damage = 10.5;
@@ -148,8 +147,10 @@ const min_rFactor = 0.4;
 const teleportCoolDownTime = 1500;
 
 class Player {
-  constructor(radius, start_x, start_y) {
+  constructor(radius, start_x, start_y, selected_weapon = "Laser") {
     let _difficulty = (difficulty in difficulty_modifiers) ? difficulty : 'normal';
+    let _selected_weapon = weapon_types.includes(selected_weapon) ? selected_weapon : "Laser";
+    this.selected_weapon = _selected_weapon;
     this._hp = starting_HP * difficulty_modifiers[_difficulty].playerHP;
     this.damage = starting_damage * difficulty_modifiers[_difficulty].playerDamage;
     this.r = radius;

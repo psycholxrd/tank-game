@@ -9,13 +9,13 @@ const paused_cont = document.getElementById('paused-cont');
 const highscore_text = document.getElementById("highscore");
 const entity_panel = document.getElementById("entity-panel");
 const grid_slider = document.getElementById("grid-intensity");
-const clock = new Clock();
-const freezeClock = new FreezeClock(freezing_time);
 const respawn_point = {
   x: u * 2,
   y: u * 7,
 };
-const you = new Player(u / 2, respawn_point.x, respawn_point.y);
+const you = new Player(u / 2, respawn_point.x, respawn_point.y, "Sniper");
+const laser = new Laser(you);
+const sniper = new Sniper(you);
 const defaultFPS = 60;
 
 window.addEventListener('resize', (e) => {
@@ -72,17 +72,6 @@ function create_enemies(amount) {
     let enemy = new Enemy(x, y, 0.5, 0.5);
     enemies.push(enemy);
   }
-}
-
-function distance(x1, y1, x2, y2) {
-  return Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
-}
-
-function get_rgb() {
-  let d = distance(mouse.x, mouse.y, you.x, you.y);
-  if (d < you.r * 1.25) d = you.r * 1.25;
-  let value = (255 / Math.min(window.innerWidth, window.innerHeight)) * d;
-  return [value, value, value];
 }
 
 function apple_collision_check() {
@@ -147,17 +136,6 @@ function handle_enemy_collision() {
 }
 
 //player drawing
-let mouse = {
-  x: 0,
-  y: 0,
-};
-let keys = {
-  u: false,
-  d: false,
-  l: false,
-  r: false,
-};
-
 const img = new Image();
 const set_source = () => img.src = `images/level ${current_level}.png`;
 
@@ -246,33 +224,15 @@ function draw_tank() {
   you.update_speed();
   you.update_pos();
   you.update_damage();
-  you.update_color(...get_rgb());
-  c.begin();
-  c.set_property("lineWidth", 1000 / get_rgb()[0]);
-  c.set_property("strokeStyle", you.color);
-  c.moveTo(you.x, you.y);
-  c.lineTo(mouse.x, mouse.y);
-  c.stroke();
 
-  c.begin();
-  c.set_property("lineWidth", 5);
-  c.set_property(
-    "strokeStyle",
-    clock.cd.locked.shoot_enemy ? "darkred" : "lime"
-  );
-  let _100percent = 2 * Math.PI;
-  let _current_percent =
-    (clock.cd.current.shoot_enemy / clock.cd.default.shoot_enemy) * 100;
-  c.arc(
-    mouse.x,
-    mouse.y,
-    u / 2,
-    0,
-    clock.cd.locked.shoot_enemy
-      ? (_100percent / 100) * _current_percent
-      : _100percent
-  );
-  c.stroke();
+  switch(you.selected_weapon){
+    case "Laser":
+      laser.draw();
+      break
+    case "Sniper":
+      sniper.draw();
+      break;
+  }
 
   c.begin();
   c.set_property("fillStyle", you.activeColor);
@@ -615,54 +575,6 @@ function handle_keys() {
 
 window.requestAnimationFrame(handle_keys);
 
-//event listeners
-window.addEventListener("mousemove", (e) => {
-  mouse.x = e.clientX;
-  mouse.y = e.clientY;
-});
-
-window.addEventListener("keydown", (e) => {
-  switch (e.code) {
-    case "KeyW":
-    case "ArrowUp":
-      keys.u = true;
-      break;
-    case "KeyS":
-    case "ArrowDown":
-      keys.d = true;
-      break;
-    case "KeyA":
-    case "ArrowLeft":
-      keys.l = true;
-      break;
-    case "KeyD":
-    case "ArrowRight":
-      keys.r = true;
-      break;
-  }
-});
-
-window.addEventListener("keyup", (e) => {
-  switch (e.code) {
-    case "KeyW":
-    case "ArrowUp":
-      keys.u = false;
-      break;
-    case "KeyS":
-    case "ArrowDown":
-      keys.d = false;
-      break;
-    case "KeyA":
-    case "ArrowLeft":
-      keys.l = false;
-      break;
-    case "KeyD":
-    case "ArrowRight":
-      keys.r = false;
-      break;
-  }
-});
-
 //shooting logic
 function apply_shoot_enemy(_x, _y) {
   for (let enemy of enemies) {
@@ -672,13 +584,13 @@ function apply_shoot_enemy(_x, _y) {
       _y > enemy.corners.lu.y &&
       _y < enemy.corners.rd.y
     ) {
-      enemy.hp -= (you.damage * 100) / get_rgb()[0];
+      enemy.hp -= (you.damage * 100) / laser.rgb_value;
       enemy.damage_active = true;
       enemy.enemyColor = skin_colors[enemy.type].damaged_body;
       setTimeout(() => {
         enemy.damage_active = false;
       }, 150);
-      clock.shoot_enemy();
+      clock[laser.reloadKey]();
     }
   }
 }
@@ -702,7 +614,11 @@ function check_dead_enemies() {
 
 document.addEventListener("mousedown", (e) => {
   if (e.button !== 0) return;
-  if (!clock.cd.locked.shoot_enemy) apply_shoot_enemy(e.clientX, e.clientY);
+  switch(you.selected_weapon){
+    case "Laser":
+      if (!clock.cd.locked[laser.reloadKey]) apply_shoot_enemy(e.clientX, e.clientY);
+      break
+  }
 });
 
 document.addEventListener("contextmenu", (e) => {
