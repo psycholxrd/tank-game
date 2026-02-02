@@ -156,3 +156,5 @@ const min_rFactor = 0.4;
 // --WEAPONS--
 const weapon_types = ["Laser", "Sniper"];
 const player_projectile_types = ["Snipe"];
+const laser_min_distance_factor = 125;
+const sniper_damage_multiplier = 4.5;

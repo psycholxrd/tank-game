@@ -4,7 +4,8 @@ class Player {
     let _selected_weapon = weapon_types.includes(selected_weapon) ? selected_weapon : "Laser";
     this.selected_weapon = _selected_weapon;
     this._hp = starting_HP * difficulty_modifiers[_difficulty].playerHP;
-    this.damage = starting_damage * difficulty_modifiers[_difficulty].playerDamage;
+    //this.damage = starting_damage * difficulty_modifiers[_difficulty].playerDamage;
+    this.damage;
     this.r = radius;
     this._rFactor = starting_rFactor;
     this.unscaled = {

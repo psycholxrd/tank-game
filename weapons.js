@@ -24,7 +24,7 @@ class Laser extends Weapon{
         //max = 255
         if(!mouse.x || !mouse.y) return 255;
         let d = distance(mouse.x, mouse.y, this.owner.x, this.owner.y);
-        if (d < this.owner.r * 1.25) d = this.owner.r * 1.25;
+        if (d < this.owner.rFactor * laser_min_distance_factor) d = this.owner.rFactor * laser_min_distance_factor;
         let calculated_value = (255 / Math.min(window.innerWidth, window.innerHeight)) * d;
         return Math.min(255, calculated_value);
     }

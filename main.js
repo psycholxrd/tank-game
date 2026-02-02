@@ -63,6 +63,221 @@ function msToTime(ms){
   return `${minutesStr}:${secondsStr}:${millisecondsStr}`;
 }
 
+function analyse_balance(){
+  //purely for debugging, no game functionality in here
+  const a_player_rFactor = {
+    min: min_rFactor,
+    max: starting_rFactor, //because it never increases
+  };
+  const avg_player_rFactor = (a_player_rFactor.min + a_player_rFactor.max) / 2;
+  const a_enemy_side = {
+    min: 0.1,
+    max: 2,
+  };
+  const avg_enemy_side = (a_enemy_side.min + a_enemy_side.max) / 2;
+  // source: enemy class, entity sliders in editor
+  const a_enemy_hp = { // with hp I mean starting hp
+    min: (a_enemy_side.min + a_enemy_side.min) * 100,
+    max: (a_enemy_side.max + a_enemy_side.max) * 100,
+  };
+  const avg_enemy_hp = (a_enemy_hp.min + a_enemy_hp.max) / 2;
+  //source: player class, draw_tank function
+  const a_player_hp = {
+    min: starting_HP,
+    max: starting_HP * 3, //there is actually no limit, but 300% is max rendered
+  };
+  const avg_player_hp = (a_player_hp.min + a_player_hp.max) / 2;
+  //source: player class
+  const a_player_damage = {
+    min: starting_damage / (a_player_rFactor.max * 1.425),
+    max: starting_damage / (a_player_rFactor.min * 1.425),
+  };
+  const avg_player_damage = (a_player_damage.min + a_player_damage.max)/2;
+  // source: weapons laser class
+  const a_rgb_value = {
+    min: 1,
+    max: 255
+  }
+  const avg_rgb_value = (a_rgb_value.min + a_rgb_value.max)/2;
+  //source: weapons laser class
+  const a_weapon_laser_damage = {
+    min: (a_player_damage.min * 100) / a_rgb_value.max,
+    max: (a_player_damage.max * 100) / a_rgb_value.min,
+  }
+  const avg_weapon_laser_damage = (a_weapon_laser_damage.min + a_weapon_laser_damage.max )/2;
+  //(you.damage / you.rFactor) * 4
+  const a_weapon_sniper_damage = {
+    min: (a_player_damage.min / a_player_rFactor.max) * sniper_damage_multiplier,
+    max: (a_player_damage.max / a_player_rFactor.min) * sniper_damage_multiplier,
+  }
+  const avg_weapon_sniper_damage = (a_weapon_sniper_damage.min+a_weapon_sniper_damage.max)/2;
+  console.log(`
+    %c
+    --MINIMUMS--
+    player rFactor: ${a_player_rFactor.min}
+    enemy side: ${a_enemy_side.min}
+    enemy hp: ${a_enemy_hp.min}
+    player hp: ${a_player_hp.min}
+    player base damage: ${a_player_damage.min}
+    rgb value: ${a_rgb_value.min}
+    Laser damage: ${a_weapon_laser_damage.min}
+    Sniper damage: ${a_weapon_sniper_damage.min}
+  `, 'color: green');
+  console.log(`
+    %c
+    --AVERAGES--
+    player rFactor: ${avg_player_rFactor}
+    enemy side: ${avg_enemy_side}
+    enemy hp: ${avg_enemy_hp}
+    player hp: ${avg_player_hp}
+    player base damage: ${avg_player_damage}
+    rgb value: ${avg_rgb_value}
+    Laser damage: ${avg_weapon_laser_damage}
+    Sniper damage: ${avg_weapon_sniper_damage}
+  `, 'color: orange');
+  console.log(`
+    %c
+    --MAXIMUMS--
+    player rFactor: ${a_player_rFactor.max}
+    enemy side: ${a_enemy_side.max}
+    enemy hp: ${a_enemy_hp.max}
+    player hp: ${a_player_hp.max}
+    player base damage: ${a_player_damage.max}
+    rgb value: ${a_rgb_value.max}
+    Laser damage: ${a_weapon_laser_damage.max}
+    Sniper damage: ${a_weapon_sniper_damage.max}
+  `, 'color: red');
+  //damage analysis
+  const min_min_hits_to_kill_enemy = {
+    laser: a_enemy_hp.min / a_weapon_laser_damage.min,
+    sniper: a_enemy_hp.min / a_weapon_sniper_damage.min,
+  };
+  const min_avg_hits_to_kill_enemy = {
+    laser: a_enemy_hp.min / avg_weapon_laser_damage,
+    sniper: a_enemy_hp.min / avg_weapon_sniper_damage,
+  };
+  const min_max_hits_to_kill_enemy = {
+    laser: a_enemy_hp.min / a_weapon_laser_damage.max,
+    sniper: a_enemy_hp.min / a_weapon_sniper_damage.max,
+  };
+  const avg_min_hits_to_kill_enemy = {
+    laser: avg_enemy_hp / a_weapon_laser_damage.min,
+    sniper: avg_enemy_hp / a_weapon_sniper_damage.min,
+  };
+  const avg_avg_hits_to_kill_enemy = {
+    laser: avg_enemy_hp / avg_weapon_laser_damage,
+    sniper: avg_enemy_hp / avg_weapon_sniper_damage,
+  };
+  const avg_max_hits_to_kill_enemy = {
+    laser: avg_enemy_hp / a_weapon_laser_damage.max,
+    sniper: avg_enemy_hp / a_weapon_sniper_damage.max,
+  };
+  const max_min_hits_to_kill_enemy = {
+    laser: a_enemy_hp.max / a_weapon_laser_damage.min,
+    sniper: a_enemy_hp.max / a_weapon_sniper_damage.min,
+  };
+  const max_avg_hits_to_kill_enemy = {
+    laser: a_enemy_hp.max / avg_weapon_laser_damage,
+    sniper: a_enemy_hp.max / avg_weapon_sniper_damage,
+  };
+  const max_max_hits_to_kill_enemy = {
+    laser: a_enemy_hp.max / a_weapon_laser_damage.max,
+    sniper: a_enemy_hp.max / a_weapon_sniper_damage.max,
+  };
+  const a_laser_cooldown = clock.cd.default.shoot_enemy;
+  const a_sniper_cooldown = clock.cd.default.snipe_enemy;
+  console.log(`
+    %c
+    --HITS TO KILL ENEMY WITH EACH WEAPON--
+    (Min -> Min)
+    Laser: ${min_min_hits_to_kill_enemy.laser}
+    Sniper: ${min_min_hits_to_kill_enemy.sniper}
+    (Min -> Average)
+    Laser: ${min_avg_hits_to_kill_enemy.laser}
+    Sniper: ${min_avg_hits_to_kill_enemy.sniper}
+    (Min -> Max)
+    Laser: ${min_max_hits_to_kill_enemy.laser}
+    Sniper: ${min_max_hits_to_kill_enemy.sniper}
+    (Average -> Min)
+    Laser: ${avg_min_hits_to_kill_enemy.laser}
+    Sniper: ${avg_min_hits_to_kill_enemy.sniper}
+    (Average -> Average)
+    Laser: ${avg_avg_hits_to_kill_enemy.laser}
+    Sniper: ${avg_avg_hits_to_kill_enemy.sniper}
+    (Average -> Max)
+    Laser: ${avg_max_hits_to_kill_enemy.laser}
+    Sniper: ${avg_max_hits_to_kill_enemy.sniper}
+    (Max -> Min)
+    Laser: ${max_min_hits_to_kill_enemy.laser}
+    Sniper: ${max_min_hits_to_kill_enemy.sniper}
+    (Max -> Average)
+    Laser: ${max_avg_hits_to_kill_enemy.laser}
+    Sniper: ${max_avg_hits_to_kill_enemy.sniper}
+    (Max -> Max)
+    Laser: ${max_max_hits_to_kill_enemy.laser}
+    Sniper: ${max_max_hits_to_kill_enemy.sniper}
+
+    (WORST CASE)
+    Laser: ${Math.max(
+      min_min_hits_to_kill_enemy.laser,
+      min_avg_hits_to_kill_enemy.laser,
+      min_max_hits_to_kill_enemy.laser,
+      avg_min_hits_to_kill_enemy.laser,
+      avg_avg_hits_to_kill_enemy.laser,
+      avg_max_hits_to_kill_enemy.laser,
+      max_min_hits_to_kill_enemy.laser,
+      max_avg_hits_to_kill_enemy.laser,
+      max_max_hits_to_kill_enemy.laser,
+    )}
+    Sniper: ${Math.max(
+      min_min_hits_to_kill_enemy.sniper,
+      min_avg_hits_to_kill_enemy.sniper,
+      min_max_hits_to_kill_enemy.sniper,
+      avg_min_hits_to_kill_enemy.sniper,
+      avg_avg_hits_to_kill_enemy.sniper,
+      avg_max_hits_to_kill_enemy.sniper,
+      max_min_hits_to_kill_enemy.sniper,
+      max_avg_hits_to_kill_enemy.sniper,
+      max_max_hits_to_kill_enemy.sniper,
+    )}
+
+    (BEST CASE)
+    Laser: ${Math.min(
+      min_min_hits_to_kill_enemy.laser,
+      min_avg_hits_to_kill_enemy.laser,
+      min_max_hits_to_kill_enemy.laser,
+      avg_min_hits_to_kill_enemy.laser,
+      avg_avg_hits_to_kill_enemy.laser,
+      avg_max_hits_to_kill_enemy.laser,
+      max_min_hits_to_kill_enemy.laser,
+      max_avg_hits_to_kill_enemy.laser,
+      max_max_hits_to_kill_enemy.laser,
+    )}
+    Sniper: ${Math.min(
+      min_min_hits_to_kill_enemy.sniper,
+      min_avg_hits_to_kill_enemy.sniper,
+      min_max_hits_to_kill_enemy.sniper,
+      avg_min_hits_to_kill_enemy.sniper,
+      avg_avg_hits_to_kill_enemy.sniper,
+      avg_max_hits_to_kill_enemy.sniper,
+      max_min_hits_to_kill_enemy.sniper,
+      max_avg_hits_to_kill_enemy.sniper,
+      max_max_hits_to_kill_enemy.sniper,
+    )}
+
+    (DPS)
+    Laser:
+    - min ${a_weapon_laser_damage.min/(a_laser_cooldown/1000)}
+    - avg ${avg_weapon_laser_damage/(a_laser_cooldown/1000)}
+    - max ${a_weapon_laser_damage.max/(a_laser_cooldown/1000)}
+    Sniper:
+    - min ${a_weapon_sniper_damage.min/(a_sniper_cooldown/1000)}
+    - avg ${avg_weapon_sniper_damage/(a_sniper_cooldown/1000)}
+    - max ${a_weapon_sniper_damage.max/(a_sniper_cooldown/1000)}
+  `, 'color: purple');
+
+}
+
 function updateHighscoreText(){
   let last_best = localStorage.getItem('[Tanks] BestTime');
   let suffix = !!last_best ? msToTime(JSON.parse(last_best)) : '-';
@@ -140,7 +355,7 @@ function handle_offscreen_player_projectile(projectile) {
 }
 
 function apply_snipe_enemy(){
-  let proj = new PlayerProjectile('Snipe', sniper.bullet_start, sniper.bullet_direction, you.rFactor*9, (you.damage / you.rFactor) * 4, you.rFactor*0.5);
+  let proj = new PlayerProjectile('Snipe', sniper.bullet_start, sniper.bullet_direction, you.rFactor*9, (you.damage / you.rFactor) * sniper_damage_multiplier, you.rFactor*0.5);
   player_projectiles.push(proj);
   clock[sniper.reloadKey]();
 }
@@ -677,6 +892,53 @@ function check_dead_enemies() {
         enemy.p_ctxs.pop();
       }
     }
+  }
+}
+
+window.attack_at = (x, y) => {
+  mouse.x = x;
+  mouse.y = y;
+  switch(you.selected_weapon){
+    case "Laser":
+      if (!clock.cd.locked[laser.reloadKey]) apply_shoot_enemy(x, y);
+      break
+    case "Sniper":
+      if (!clock.cd.locked[sniper.reloadKey] && active_screen === "game") apply_snipe_enemy();
+      break;
+  }
+}
+
+window.pressMoveKey = (direction) => {
+  switch(direction){
+    case "up":
+      keys.u = true;
+      break
+    case "down":
+      keys.d = true;
+      break
+    case "left":
+      keys.l = true;
+      break
+    case "right":
+      keys.r = true;
+      break
+  }
+}
+
+window.unpressMoveKey = (direction) => {
+  switch(direction){
+    case "up":
+      keys.u = false;
+      break
+    case "down":
+      keys.d = false;
+      break
+    case "left":
+      keys.l = false;
+      break
+    case "right":
+      keys.r = false;
+      break
   }
 }
 

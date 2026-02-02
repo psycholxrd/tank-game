@@ -15,7 +15,7 @@ class Clock {
       default: {
         enemy_knock_damage: old60FPSCooldownToMilliseconds(40),
         shoot_enemy: old60FPSCooldownToMilliseconds(25),
-        snipe_enemy: old60FPSCooldownToMilliseconds(70),
+        snipe_enemy: old60FPSCooldownToMilliseconds(45),
         switch_weapon: old60FPSCooldownToMilliseconds(500),
       },
 
