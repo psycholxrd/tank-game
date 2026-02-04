@@ -1,4 +1,5 @@
 const final_level = 10;
+const level_display = document.getElementById('level-display');
 let starting_time;
 let final_time;
 let paused_timestamp;
@@ -273,6 +274,7 @@ function load_level(number) {
   proj_timers = [];
   game_active = true;
   current_level = number;
+  level_display.innerText = `Level ${number}`;
   let l1 = levels[number].apples.length;
   let l2 = levels[number].enemies.length;
   for (let i = 0; i < l1; i++) {
