@@ -17,10 +17,12 @@
         <b class = "menu-text" id = "highscore">Best Time: -</b>
       </div>
       <div id = "game-container">
-        <div id = "timer">00:00:00</div>
-        <div id = "level-display">Level 1</div>
+        <div id = "game-header">
+          <div id = "timer">00:00:00</div>
+          <div id = "level-display">Level 1</div>
+          <button id = "pause-btn" onclick=handlePause()>||</button>
+        </div>
         <canvas id="canvas"></canvas>
-        <button id = "pause-btn" onclick=handlePause()>||</button>
         <div id = "paused-cont">
           <div id = "dimmer"></div>
           <div class = "paused-btn" onclick = handleUnpause()>Resume</div>
