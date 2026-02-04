@@ -33,7 +33,7 @@ const difficulty_modifiers = {
 
 // --ENEMIES--
 const enemy_knock_damage = 150;
-const boss_types = ["Ice Wizard", "Cry Baby", "Mega Org"];
+const boss_types = ["Ice Wizard", "Cry Baby", "Mega Org", "Invincible"];
 const slave_types = ["Frosty", "Crier", "Org"];
 /*
 EXPLANATION:
@@ -86,6 +86,19 @@ const stats = {
     isBouncy: false,
     bounceTime: 0,
     isWavy: false,
+    frequency: 1,
+    amplitude: 1,
+  },
+  'Invincible': {
+    projectile_directions: [0, 1, 0, 1, 0, 1, 0, 1, 0],
+    last_direction: 0,
+    projectile_type: 'Arrow',
+    damage: 9999,
+    cooldown: 50,
+    projectileSlowness: 3,
+    isBouncy: false,
+    bounceTime: 0,
+    isWavy: true,
     frequency: 1,
     amplitude: 1,
   },

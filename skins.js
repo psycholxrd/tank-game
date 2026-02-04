@@ -62,6 +62,15 @@ let skin_colors = {
     mouth: "black",
     teeth: "white",
   },
+  Invincible: {
+    body: "#f2c1ae",
+    damaged_body: "#e57373",
+    hair: "#1a1a1a",
+    mask_blue: "#2b59c3",
+    mask_yellow: "#f2d024",
+    eyes: "white",
+    outline: "black",
+  },
   Frosty: {
     body: "Plum",
     damaged_body: "Magenta",
@@ -681,6 +690,63 @@ function draw_enemy_skin(Enemy, _c = c) {
         _c.set_property("strokeStyle", skin_colors[Enemy.type].outline);
         _c.strokeRect(x, y, w, h);
         break;
+    case boss_types[3]: // Invincible
+      // Handle damage color flicker
+      let currentBodyColor = Enemy.damage_active 
+        ? skin_colors[Enemy.type].damaged_body 
+        : skin_colors[Enemy.type].body;
+
+      // 1. BASE SKIN (The face/neck base)
+      _c.begin();
+      _c.set_property("fillStyle", currentBodyColor);
+      _c.fillRect(x, y, w, h);
+
+      // 2. HAIR (Messy spikes poking out the top)
+      fillPath16(skin_colors[Enemy.type].hair, [
+        [1, 5], [3, 1], [6, 4], [9, 0], [13, 2], [15, 5], [15, 7], [1, 7]
+      ]);
+
+      // 3. BLUE COWL (Sides of the mask)
+      fillPath16(skin_colors[Enemy.type].mask_blue, [
+        [0, 6], [16, 6], [16, 13], [14, 15], [2, 15], [0, 13]
+      ]);
+
+      // 4. YELLOW CENTER STRIP (The "i" shape on the face)
+      fillPath16(skin_colors[Enemy.type].mask_yellow, [
+        [6, 6], [10, 6], [10, 14], [8, 16], [6, 14]
+      ]);
+
+      // 5. EXPOSED CHIN (Clearing the mask for the lower face)
+      fillPath16(currentBodyColor, [
+        [5, 12], [11, 12], [12, 16], [4, 16]
+      ]);
+
+      // 6. LEFT LENS (Angled for a determined look)
+      fillPath16(skin_colors[Enemy.type].eyes, [
+        [2, 8], [6, 8], [6, 11], [3, 12]
+      ]);
+      strokePath16(skin_colors[Enemy.type].outline, [
+        [2, 8], [6, 8], [6, 11], [3, 12], [2, 8]
+      ]);
+
+      // 7. RIGHT LENS
+      fillPath16(skin_colors[Enemy.type].eyes, [
+        [10, 8], [14, 8], [13, 12], [10, 11]
+      ]);
+      strokePath16(skin_colors[Enemy.type].outline, [
+        [10, 8], [14, 8], [13, 12], [10, 11], [10, 8]
+      ]);
+
+      // 8. NOSE & MOUTH DETAILS
+      strokePath16(skin_colors[Enemy.type].outline, [[8, 12], [7, 13], [8, 13]]); // Nose
+      strokePath16(skin_colors[Enemy.type].outline, [[6, 15], [10, 15]]);          // Mouth
+
+      // 9. FINAL BORDER
+      _c.begin();
+      _c.set_property("strokeStyle", skin_colors[Enemy.type].outline);
+      _c.set_property("lineWidth", 1);
+      _c.strokeRect(x, y, w, h);
+      break;
     }
   } else if (Enemy.is_Slave) {
     //console.log("is slave is true!");
