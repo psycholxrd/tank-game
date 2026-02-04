@@ -159,6 +159,11 @@ const stats = {
 // --PROJECTILES--
 const teleportCoolDownTime = 1500;
 
+// --APPLES--
+const shrinking_factor = 0.2;
+const min_rFactor_apple = 0.01;
+const calc_new_rFactor = (apple_rFactor) => Math.max(1 - (shrinking_factor * apple_rFactor), min_rFactor_apple);
+
 // --PLAYER--
 const starting_HP = 500;
 const starting_rFactor = 0.75;

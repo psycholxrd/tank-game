@@ -285,19 +285,24 @@ function updateHighscoreText(){
 }
 updateHighscoreText();
 
+//apple player collision
+function doesAppleTouchPlayer(apple, player){
+    return (distance(apple.x, apple.y, player.x, player.y) < apple.r + you.r);
+}
+
 function apple_collision_check() {
   for (apple in apples) {
     let curr = apples[apple];
-    let index = apples.indexOf(curr);
-    let d = distance(curr.x, curr.y, you.x, you.y);
-    if (d < curr.r + you.r) {
-      you.rFactor *= 1 - 0.2 * curr.rFactor;
-      you.hp += 500 * curr.rFactor;
+    if (doesAppleTouchPlayer(curr, you)) {
+      let index = apples.indexOf(curr);
+      you.rFactor *= calc_new_rFactor(curr.rFactor);
+      you.hp += starting_HP * curr.rFactor;
       apples.splice(index, 1);
     }
   }
 }
 
+//enemy player collision
 function enemy_player_collision_check() {
   for (let i = 0; i < enemies.length; i++) {
     let curr = enemies[i];
@@ -308,12 +313,31 @@ function enemy_player_collision_check() {
   return false;
 }
 
+//player_projectile enemy collision
+
 function player_projectile_collision_check(enemy){
   for(let pp of player_projectiles){
     let result = isCircleInRectangle(pp.x, pp.y, pp.r, enemy.x, enemy.y, enemy.w, enemy.h);
     if(result) return true;
   }
   return false;
+}
+
+function handle_player_projectile_collision(){
+  for(let e of enemies){
+    for(let pp of player_projectiles){
+      let result = isCircleInRectangle(pp.pos.x, pp.pos.y, pp.radius, e.x, e.y, e.w, e.h);
+      if(result){
+        e.hp -= pp.damage;
+        e.damage_active = true;
+        e.enemyColor = skin_colors[e.type].damaged_body;
+        setTimeout(() => {
+          e.damage_active = false;
+        }, 150);
+        delete_player_projectile(pp);
+      }
+    }
+  }
 }
 
 function handle_enemy_collision() {
@@ -369,23 +393,6 @@ function update_player_projectiles(){
 
 function draw_player_projectiles(){
   player_projectiles.forEach(proj => proj.draw());
-}
-
-function handle_player_projectile_collision(){
-  for(let e of enemies){
-    for(let pp of player_projectiles){
-      let result = isCircleInRectangle(pp.pos.x, pp.pos.y, pp.radius, e.x, e.y, e.w, e.h);
-      if(result){
-        e.hp -= pp.damage;
-        e.damage_active = true;
-        e.enemyColor = skin_colors[e.type].damaged_body;
-        setTimeout(() => {
-          e.damage_active = false;
-        }, 150);
-        delete_player_projectile(pp);
-      }
-    }
-  }
 }
 
 function player_anti_stuck(){
@@ -743,13 +750,17 @@ function handle_offscreen_projectile(projectile) {
   }
 }
 
+function doesPlayerTouchProjectile(projectile, player){
+  return (distance(projectile.x, projectile.y, player.x, player.y) < projectile.r + player.r);
+}
+
 function draw_projectiles() {
   if (!projectiles.length > 0) return; //console.warn("projectiles not existing yet");
   for (proj of projectiles) {
     proj.update_radius();
     proj.update_speed();
     proj.update_pos();
-    handle_projectile_collision(proj);
+    if (doesPlayerTouchProjectile(proj, you) && !clock.cd.locked.enemy_knock_damage) handle_projectile_collision(proj);
     draw_projectile_skin(proj);
     draw_warn_signal(proj);
     handle_offscreen_projectile(proj);
@@ -757,17 +768,14 @@ function draw_projectiles() {
 }
 
 function handle_projectile_collision(projectile) {
-  let curr = projectile;
   let index = projectiles.indexOf(projectile);
-  let d = distance(curr.x, curr.y, you.x, you.y);
-  if (d < curr.r + you.r && !clock.cd.locked.enemy_knock_damage) {
-    if(projectile.type === "Freeze"){
-      freezeClock.freeze();
-    }
-    clock.enemy_knock_damage();
-    you.hp -= curr.damage;
-    projectiles.splice(index, 1);
+  if(projectile.type === "Freeze"){
+    freezeClock.freeze();
   }
+  clock.enemy_knock_damage();
+  you.hp -= projectile.damage;
+  projectiles.splice(index, 1);
+
 }
 
 function updatePlayerColor() {
@@ -1028,9 +1036,6 @@ function setHardDifficulty(){
   change_screen('menu');
 }
 
-function open_level_selector(){
-  change_screen('level-selector');
-}
 let editor_canvas_mouse = {
   x: 0,
   y: 0,
@@ -1141,6 +1146,22 @@ let entity_default_canvases = {
   bosses: [],
   apples: [],
 };
+
+function open_level_selector(){
+  switch(active_screen){
+    case 'level-editor':
+      let level_obj = levels[active_editor_level];
+      if(!level_obj.enemies || level_obj.enemies.length === 0){
+        alert('need at least 1 enemy!');
+        return;
+      }
+      change_screen('level-selector');
+      break;
+    default:
+      change_screen('level-selector');
+      break;
+  }
+}
 
 let grid_intensity = 1;
 
@@ -1341,7 +1362,7 @@ function export_level(){
 }
 
 function import_level(){
-  let level_contents = prompt('Enter the exported level data', '{"apples": [], "enemies": [[3.25, 2.25, 0.5, "slave", "Frosty"]]}');
+  let level_contents = prompt('Enter the exported level data', '{"apples": [], "enemies": []}');
   let level_obj;
   if(level_contents !== null && level_contents !== ''){
     try{
@@ -1350,6 +1371,7 @@ function import_level(){
       let problems = [];
       let problem_str = 'Importing failed! Possible problems:';
       if(!level_contents.includes('{') || !level_contents.includes('}')) problems.push('imported Level is probably not an object');
+      if(!level_contents.includes('[') || !level_contents.includes(']')) problems.push('imported Level is probably missing an array');
       if(!level_contents.includes('enemies')) problems.push('Missing enemies key');
       if(!level_contents.includes('apples')) problems.push('Missing apples key');
       if(problems.length === 0) problems.push(err);
@@ -1362,15 +1384,16 @@ function import_level(){
   }else{
     return;
   }
-  if(!level_obj.enemies || level_obj.enemies.length === 0){
-    alert('need at least 1 enemy!');
-    return;
-  }
   levels[active_editor_level] = level_obj;
   editor_level = levels[active_editor_level];
 }
 
 function remember_level(){
+  let level_obj = levels[active_editor_level];
+  if(!level_obj.enemies || level_obj.enemies.length === 0){
+    alert('need at least 1 enemy to remember level!');
+    return;
+  }
   localStorage.setItem(`[Tanks] Level ${active_editor_level}`, JSON.stringify(editor_level));
   alert('Successfully remembered level! It will now automatically load even when you refresh the page. To undo this, click the "Forget level" button.');
 }
