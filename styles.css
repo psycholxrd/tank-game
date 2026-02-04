@@ -9,9 +9,37 @@
   /*text*/
   --font-size-menu: 4vh;
   --font-size-difficulty: 3vh;
+  --font-size-large: 6vh;
+  --font-size-medium: 3vh;
+  --font-size-small: 2vh;
+  --font-size-title: 5vh;
   --transition-size-factor: 1.2;
   /*containers*/
   --cont-size: 90%;
+  --border-size-large: 15px;
+  --border-size-medium: 8px;
+  --border-size-small: 5px;
+  --padding-standard: 20px;
+  --padding-small: 10px;
+  --margin-standard: 1%;
+  --margin-medium: 2vh;
+  --margin-large: 20px;
+  --border-radius-standard: 15px;
+  --border-radius-small: 10px;
+  --border-radius-tiny: 8px;
+  --color-white: white;
+  --color-black: black;
+  --color-yellow: yellow;
+  --color-darkorange: darkorange;
+  --color-lightcyan: lightcyan;
+  --color-lightskyblue: LightSkyBlue;
+  --color-darkslateblue: darkslateblue;
+  --color-transparent: transparent;
+  /*animations*/
+  --animation-duration-short: 750ms;
+  --animation-duration-standard: 1s;
+  --animation-duration-long: 1500ms;
+  --animation-timing: ease;
 }
 
 body {
@@ -45,12 +73,12 @@ body {
   left: calc((100% - var(--cont-size))/2);
   width: var(--cont-size);
   height: var(--cont-size);
-  background-color: darkslateblue;
+  background-color: var(--color-darkslateblue);
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  border: 15px solid black;
-  border-radius: 15px;
+  border: var(--border-size-large) solid var(--color-black);
+  border-radius: var(--border-radius-standard);
 }
 
 #game-container {
@@ -83,8 +111,8 @@ body {
   flex-direction: row;
   /*justify-content: center;*/
   align-items: center;
-  border: 15px solid black;
-  border-radius: 15px;
+  border: var(--border-size-large) solid var(--color-black);
+  border-radius: var(--border-radius-standard);
   overflow-y: auto;    /* vertical scrollbar appears when needed */
   overflow-x: hidden;  /* prevents horizontal scroll */
 }
@@ -107,22 +135,22 @@ body {
   display: flex;
   width: 80%;
   height: 12.5%;
-  margin: 1%;
+  margin: var(--margin-standard);
   background-color: var(--btn-inside-before);
-  color: white;
-  font-size: 3vh;
+  color: var(--color-white);
+  font-size: var(--font-size-medium);
   justify-content: center;
   align-items: center;
-  border: 5px solid white;
-  border-radius: 15px;
+  border: var(--border-size-small) solid var(--color-white);
+  border-radius: var(--border-radius-standard);
   transition: all 0.3s ease;
   animation-name: level-editor-btn-animation;
-  animation-duration: 1s;
+  animation-duration: var(--animation-duration-standard);
 }
 
 .level-editor-text {
-  font-size: 2vh;
-  color: white;
+  font-size: var(--font-size-small);
+  color: var(--color-white);
   display: flex;
 }
 
@@ -131,8 +159,8 @@ body {
   cursor: pointer;
   width: 90%;
   height: 15%;
-  font-size: calc(3vh * var(--transition-size-factor));
-  border-radius: calc(15px * var(--btn-border-radius-factor));
+  font-size: calc(var(--font-size-medium) * var(--transition-size-factor));
+  border-radius: calc(var(--border-radius-standard) * var(--btn-border-radius-factor));
 }
 
 @keyframes level-editor-canvas-animation{
@@ -181,12 +209,12 @@ body {
   left: calc((100% - var(--cont-size))/2);
   width: var(--cont-size);
   height: var(--cont-size);
-  background-color: darkslateblue;
+  background-color: var(--color-darkslateblue);
   flex-direction: column;
   /*justify-content: center;*/
   align-items: center;
-  border: 15px solid black;
-  border-radius: 15px;
+  border: var(--border-size-large) solid var(--color-black);
+  border-radius: var(--border-radius-standard);
   overflow-y: auto;    /* vertical scrollbar appears when needed */
   overflow-x: hidden;  /* prevents horizontal scroll */
 }
@@ -207,17 +235,17 @@ body {
   display: flex;
   width: 50%;
   height: 12.5%;
-  margin: 1%;
-  background-color: var(--btn-inside-before);;
-  color: white;
-  font-size: 3vh;
+  margin: var(--margin-standard);
+  background-color: var(--btn-inside-before);
+  color: var(--color-white);
+  font-size: var(--font-size-medium);
   justify-content: center;
   align-items: center;
-  border: 8px solid darkorange;
-  border-radius: 15px;
+  border: var(--border-size-medium) solid var(--color-darkorange);
+  border-radius: var(--border-radius-standard);
   transition: all 0.3s ease;
   animation-name: level-selector-btn-animation;
-  animation-duration: 1s;
+  animation-duration: var(--animation-duration-standard);
 }
 
 .level-selector-btn:hover {
@@ -225,8 +253,8 @@ body {
   cursor: pointer;
   width: 60%;
   height: 15%;
-  font-size: calc(3vh * var(--transition-size-factor));
-  border-radius: calc(15px * var(--btn-border-radius-factor));
+  font-size: calc(var(--font-size-medium) * var(--transition-size-factor));
+  border-radius: calc(var(--border-radius-standard) * var(--btn-border-radius-factor));
 }
 
 @keyframes level-selector-text-animation{
@@ -239,10 +267,10 @@ body {
 }
 
 .level-selector-text {
-  color: white;
-  font-size: 2vh;
+  color: var(--color-white);
+  font-size: var(--font-size-small);
   animation-name: level-selector-text-animation;
-  animation-duration: 1s;
+  animation-duration: var(--animation-duration-standard);
 }
 
 @keyframes menu-text-animation {
@@ -257,11 +285,11 @@ body {
 }
 
 .menu-text {
-  font-size: 3vh;
-  color: yellow;
+  font-size: var(--font-size-medium);
+  color: var(--color-yellow);
   text-shadow: 1px 1px 3px red;
   animation-name: menu-text-animation;
-  animation-duration: 1s;
+  animation-duration: var(--animation-duration-standard);
 }
 
 @keyframes menu-big-text-animation{
@@ -277,11 +305,11 @@ body {
 
 .menu-big-text {
   font-family: Arial, Helvetica, sans-serif;
-  font-size: 6vh;
-  color: white;
-  text-shadow: 3px 3px 6px black;
+  font-size: var(--font-size-large);
+  color: var(--color-white);
+  text-shadow: 3px 3px 6px var(--color-black);
   animation-name: menu-big-text-animation;
-  animation-duration: 1s;
+  animation-duration: var(--animation-duration-standard);
 }
 
 @keyframes menu-btn-animation {
@@ -302,27 +330,27 @@ body {
   display: flex;
   width: 85%;
   height: 12.5%;
-  margin: 1%;
+  margin: var(--margin-standard);
   background-color: var(--btn-inside-before);
-  color: white;
+  color: var(--color-white);
   font-size: var(--font-size-menu);
   justify-content: center;
   align-items: center;
-  border: 15px solid LightSkyBlue;
+  border: var(--border-size-large) solid var(--color-lightskyblue);
   border-radius: var(--btn-border-radius-menu);
   transition: all 0.3s ease;
   animation-name: menu-btn-animation;
-  animation-duration: 1500ms;
+  animation-duration: var(--animation-duration-long);
 }
 
 .menu-btn:hover {
   background-color: var(--btn-inside-after);
   width: 90%;
   height: 15%;
-  border: 15px solid lightcyan;
+  border: var(--border-size-large) solid var(--color-lightcyan);
   border-radius: calc(var(--btn-border-radius-menu)*var(--btn-border-radius-factor));
   font-size: calc(var(--font-size-menu)*var(--transition-size-factor));
-  color: yellow;
+  color: var(--color-yellow);
   cursor: pointer;
 }
 
@@ -333,12 +361,12 @@ body {
   left: calc((100% - var(--cont-size))/2);
   width: var(--cont-size);
   height: var(--cont-size);
-  background-color: darkslateblue;
+  background-color: var(--color-darkslateblue);
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  border: 15px solid black;
-  border-radius: 15px;
+  border: var(--border-size-large) solid var(--color-black);
+  border-radius: var(--border-radius-standard);
 }
 
 @keyframes difficulty-btn-animation {
@@ -357,17 +385,17 @@ body {
   display: flex;
   width: 50%;
   height: 12.5%;
-  margin: 1%;
+  margin: var(--margin-standard);
   background-color: var(--btn-inside-before);
-  color: white;
+  color: var(--color-white);
   font-size: var(--font-size-difficulty);
   justify-content: center;
   align-items: center;
-  border: 8px solid darkorange;
+  border: var(--border-size-medium) solid var(--color-darkorange);
   border-radius: var(--btn-border-radius-difficulty);
   transition: all 0.5s ease;
   animation-name: difficulty-btn-animation;
-  animation-duration: 1s;
+  animation-duration: var(--animation-duration-standard);
 }
 
 .difficulty-btn:hover {
@@ -389,10 +417,10 @@ body {
 }
 
 .difficulty-text {
-  font-size: 6vh;
+  font-size: var(--font-size-large);
   color: whitesmoke;
   animation-name: difficulty-text-animation;
-  animation-duration: 750ms;
+  animation-duration: var(--animation-duration-short);
 }
 
 #game-header {
@@ -413,15 +441,15 @@ body {
   display: flex;
   width: 20vh;
   height: 6vh;
-  padding: 10px 20px;
+  padding: var(--padding-small) var(--padding-standard);
   background-color: rgba(100, 100, 0, 0.4);
-  color: white;
-  font-size: 5vh;
+  color: var(--color-white);
+  font-size: var(--font-size-title);
   z-index: 10;
-  border-radius: 8px;
+  border-radius: var(--border-radius-tiny);
   justify-content: center;
   align-items: center;
-  margin: 20px;
+  margin: var(--margin-large);
   pointer-events: auto;
 }
 
@@ -436,18 +464,18 @@ body {
 }
 
 #pause-btn {
-  background-color: white;
-  border-radius: 8px;
+  background-color: var(--color-white);
+  border-radius: var(--border-radius-tiny);
   display: flex;
   justify-content: center;
   align-items: center;
   position: relative;
-  font-size: 3vh;
+  font-size: var(--font-size-medium);
   letter-spacing: 0.2em;
   text-indent: 0.2em;
   width: 6vh;
   height: 6vh;
-  margin: 20px;
+  margin: var(--margin-large);
 }
 
 #pause-btn:hover {
@@ -484,24 +512,24 @@ body {
   display: flex;
   width: 50%;
   height: 12.5%;
-  margin: 1%;
+  margin: var(--margin-standard);
   background-color: var(--btn-inside-before);
-  color: white;
-  font-size: 3vh;
+  color: var(--color-white);
+  font-size: var(--font-size-medium);
   justify-content: center;
   align-items: center;
-  border: 8px solid darkorange;
+  border: var(--border-size-medium) solid var(--color-darkorange);
   border-radius: var(--btn-border-radius-paused);
   transition: all 0.3s ease;
   animation-name: paused-btn-animation;
-  animation-duration: 1s;
+  animation-duration: var(--animation-duration-standard);
 }
 
 .paused-btn:hover {
   background-color: var(--btn-inside-after);
   width: 60%;
   height: 15%;
-  font-size: calc(3vh * var(--transition-size-factor));
+  font-size: calc(var(--font-size-medium) * var(--transition-size-factor));
   border-radius: calc(var(--btn-border-radius-paused)*var(--btn-border-radius-factor));
   cursor: pointer;
 }
@@ -511,4 +539,210 @@ body {
   height: 100%;
   position: fixed;
   background-color: rgb(0, 0, 0, 0.5);
+}
+
+@keyframes how-to-play-container-fade-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+#how-to-play-container {
+  position: relative;
+  display: none; /*flex*/
+  top: calc((100% - var(--cont-size))/2);
+  left: calc((100% - var(--cont-size))/2);
+  width: var(--cont-size);
+  height: auto;
+  background-color: var(--color-darkslateblue);
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border: var(--border-size-large) solid var(--color-black);
+  border-radius: var(--border-radius-standard);
+  overflow-y: auto;    /* vertical scrollbar appears when needed */
+  overflow-x: hidden;  /* prevents horizontal scroll */
+  animation: how-to-play-container-fade-in var(--animation-duration-standard) var(--animation-timing);
+}
+
+@keyframes how-to-play-wrapper-slide-in {
+  from {
+    transform: translateY(50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+#how-to-play-wrapper {
+  position: relative;
+  width: 90%;
+  height: 80%;
+  background-color: rgba(255, 255, 255, 0.1);
+  border: var(--border-size-small) solid var(--color-white);
+  border-radius: var(--border-radius-small);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  padding: var(--margin-medium);
+  overflow-y: auto;
+  animation: how-to-play-wrapper-slide-in var(--animation-duration-standard) var(--animation-timing);
+}
+
+@keyframes how-to-play-btn-slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+#how-to-play-return-btn {
+  position: relative;
+  display: flex;
+  width: 20%;
+  height: 8%;
+  margin: var(--margin-standard);
+  background-color: var(--btn-inside-before);
+  color: var(--color-white);
+  font-size: var(--font-size-medium);
+  justify-content: center;
+  align-items: center;
+  border: var(--border-size-medium) solid var(--color-darkorange);
+  border-radius: var(--border-radius-standard);
+  transition: all 0.3s ease;
+  animation: how-to-play-btn-slide-in var(--animation-duration-standard) var(--animation-timing);
+}
+
+#how-to-play-return-btn:hover {
+  background-color: var(--btn-inside-after);
+  cursor: pointer;
+  border-radius: calc(var(--border-radius-standard) * var(--btn-border-radius-factor));
+  font-size: calc(var(--font-size-medium) * var(--transition-size-factor));
+  width: 25%;
+  height: 10%;
+}
+
+@keyframes how-to-play-next-btn-pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+#next-instruction-btn {
+  position: relative;
+  display: flex;
+  width: 10%;
+  height: 6%;
+  margin: var(--margin-standard);
+  background-color: rgba(0, 0, 0, 0.3);
+  color: var(--color-white);
+  font-size: var(--font-size-medium);
+  justify-content: center;
+  align-items: center;
+  border: var(--border-size-small) solid var(--color-white);
+  border-radius: var(--border-radius-tiny);
+  transition: all 0.3s ease;
+  animation: how-to-play-next-btn-pulse 2s infinite;
+}
+
+#next-instruction-btn:hover {
+  background-color: rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+}
+
+@keyframes instruction-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.instruction {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--margin-medium);
+  width: 90%;
+  height: auto;
+}
+
+.instruction.selected-instruction {
+  display: flex;
+  animation: instruction-fade-in var(--animation-duration-standard) var(--animation-timing);
+}
+
+@keyframes instruction-img-zoom {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.instruction-img {
+  width: 40vh;
+  height: 40vh;
+  animation: instruction-img-zoom var(--animation-duration-standard) var(--animation-timing);
+}
+
+@keyframes how-to-play-text-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.how-to-play-text {
+  display: flex;
+  position: relative;
+  color: var(--color-white);
+  font-size: var(--font-size-small);
+  line-height: 1.5em;
+  margin: var(--margin-medium);
+  width: auto;
+  height: auto;
+  text-align: center;
+  animation: how-to-play-text-fade-in var(--animation-duration-standard) var(--animation-timing);
+}
+
+@keyframes how-to-play-title-glow {
+  from {
+    opacity: 0;
+    text-shadow: 0 0 10px var(--color-yellow);
+  }
+  to {
+    opacity: 1;
+    text-shadow: 2px 2px 5px var(--color-black);
+  }
+}
+
+.how-to-play-title {
+  font-size: var(--font-size-title);
+  color: var(--color-yellow);
+  text-shadow: 2px 2px 5px var(--color-black);
+  animation: how-to-play-title-glow var(--animation-duration-standard) var(--animation-timing);
 }

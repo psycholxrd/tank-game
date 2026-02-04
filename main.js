@@ -9,6 +9,7 @@ const paused_cont = document.getElementById('paused-cont');
 const highscore_text = document.getElementById("highscore");
 const entity_panel = document.getElementById("entity-panel");
 const grid_slider = document.getElementById("grid-intensity");
+const how_to_play_cont = document.getElementById("how-to-play-container");
 const respawn_point = {
   x: u * 2,
   y: u * 7,
@@ -967,13 +968,14 @@ document.addEventListener("contextmenu", (e) => {
 });
 
 //screen changer
-const allowed_screens = ['menu', 'game', 'difficulty', 'level-selector', 'level-editor', 'game-completed'];
+const allowed_screens = ['menu', 'game', 'difficulty', 'level-selector', 'level-editor', 'how-to-play', 'game-completed'];
 const screen_displays = {
   'menu': 'flex',
   'game': 'block',
   'difficulty': 'flex',
   'level-selector': 'flex',
   'level-editor': 'flex',
+  'how-to-play': 'flex',
   'game-completed': 'block' 
 }
 const screen_containers = {
@@ -982,6 +984,7 @@ const screen_containers = {
   'difficulty': difficulty_cont,
   'level-selector': level_selector_cont,
   'level-editor': level_editor_cont,
+  'how-to-play': how_to_play_cont,
   'game-completed': {},
 };
 
@@ -1016,6 +1019,40 @@ function start_game(){
 
 function open_difficulties(){
   change_screen('difficulty');
+}
+let max_instructions = document.querySelector("#how-to-play-wrapper").children.length-3;
+let current_instruction = 1;
+function open_how_to_play(){
+  change_screen('how-to-play');
+}
+
+function reset_instructions() {
+  const offset = 2;
+  const how_to_play_wrapper = document.querySelector("#how-to-play-wrapper");
+  const children = how_to_play_wrapper.children;
+  for (let i = offset; i < children.length; i++) {
+    children[i].classList.remove('selected-instruction');
+  }
+  current_instruction = 1;
+  children[offset].classList.add('selected-instruction');
+  children[1].textContent = `1/${max_instructions}`;
+}
+
+function return_to_menu_from_how_to_play(){
+  change_screen('menu');
+  reset_instructions();
+}
+
+function next_instruction() {
+  const offset = 2; 
+  const how_to_play_wrapper = document.querySelector("#how-to-play-wrapper");
+  const children = how_to_play_wrapper.children;
+  const prev_dom_index = (current_instruction - 1) + offset;
+  current_instruction = (current_instruction % max_instructions) + 1;
+  const new_dom_index = (current_instruction - 1) + offset;
+  children[prev_dom_index].classList.remove('selected-instruction');
+  children[new_dom_index].classList.add('selected-instruction');
+  children[1].textContent = `${current_instruction}/${max_instructions}`;
 }
 
 function setEasyDifficulty(){

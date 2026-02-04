@@ -14,6 +14,7 @@
         <div class = "menu-btn" id = "Start-btn" onclick = start_game()>Start</div>
         <div class = "menu-btn" id = "Difficulty-btn" onclick = open_difficulties()>Change Difficulty</div>
         <div class = "menu-btn" id = "Level-Editor-btn" onclick = open_level_selector()>Level Editor</div>
+        <div class = "menu-btn" id = "How-to-Play-btn" onclick = open_how_to_play()>How to Play</div>
         <b class = "menu-text" id = "highscore">Best Time: -</b>
       </div>
       <div id = "game-container">
@@ -56,6 +57,85 @@
           <b class = "level-editor-text">Other:</b>
           <div class = "level-editor-btn" onclick = open_level_selector()>Return to Selector</div>
         </div>
+      </div>
+      <div id = "how-to-play-container">
+        <div id = "how-to-play-wrapper">
+          <b class = "how-to-play-title">How to Play:</b>
+          <b class = "how-to-play-text">1/8</b>
+          <div class = "instruction selected-instruction">
+            <img src = "instructions/instruction1.png" class = "instruction-img"></img>
+            <b class = "how-to-play-text">
+              There are 9 levels in this game.<br>
+              In order to beat a level, you need<br>
+              to kill all enemies.
+            </b>
+          </div>
+          <div class = "instruction">
+            <img src = "instructions/instruction2.png" class = "instruction-img"></img>
+            <b class = "how-to-play-text">
+              Use WASD or Arrow Keys to move<br>
+              and Mouse to aim and shoot.<br>
+              Different enemy projectiles<br>
+              have different behaviors.
+            </b>
+          </div>
+          <div class = "instruction">
+            <img src = "instructions/instruction3.png" class = "instruction-img"></img>
+            <b class = "how-to-play-text">
+              When the enemy projectile hits you,<br>
+              You get damaged. If you die,<br>
+              The level resets.
+            </b>
+          </div>
+          <div class = "instruction">
+            <img src = "instructions/instruction4.png" class = "instruction-img"></img>
+            <b class = "how-to-play-text">
+              Press Shift to switch<br>
+              between weapons. The Laser<br>
+              weapon deals tiny damage<br>
+              when you're far away
+            </b>
+          </div>
+          <div class = "instruction">
+            <img src = "instructions/instruction5.png" class = "instruction-img"></img>
+            <b class = "how-to-play-text">
+              but deals massive damage<br>
+              when you get close to<br>
+              the enemy.
+            </b>
+          </div>
+          <div class = "instruction">
+            <img src = "instructions/instruction6.png" class = "instruction-img"></img>
+            <b class = "how-to-play-text">
+              The Sniper's weapon damage<br>
+              doesn't depend on distance.<br>
+              It takes longer to use, but<br>
+              it deals good damage. It's<br>
+              shooting bullets at your mouse
+            </b>
+          </div>
+           <div class = "instruction">
+            <img src = "instructions/instruction7.png" class = "instruction-img"></img>
+            <b class = "how-to-play-text">
+              Whenever you eat apples,<br>
+              you get health, damage,<br>
+              speed buffs.<br>
+              <br>
+              Bigger Apples = more buff.
+            </b>
+          </div>
+           <div class = "instruction">
+            <img src = "instructions/instruction8.png" class = "instruction-img"></img>
+            <b class = "how-to-play-text">
+              when your health is full,<br>
+              eating an apple will give<br>
+              overheal up to 300% of<br>
+              your initial health.
+            </b>
+          </div>
+          <div id = "next-instruction-btn" onclick = next_instruction()>Next</div>
+        </div>
+        <div id = "how-to-play-return-btn" onclick = return_to_menu_from_how_to_play()>Return to Menu</div>
       </div>
     </div>
   </body>

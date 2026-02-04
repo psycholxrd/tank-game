@@ -267,11 +267,11 @@ function load_level(number) {
     return
   }
   game_completed = false;
-  apples = [];
-  enemies = [];
-  projectiles = [];
-  player_projectiles = [];
-  proj_timers = [];
+  apples.length = 0;
+  enemies.length = 0;
+  projectiles.length = 0;
+  player_projectiles.length = 0;
+  proj_timers.length = 0;
   game_active = true;
   current_level = number;
   level_display.innerText = `Level ${number}`;
