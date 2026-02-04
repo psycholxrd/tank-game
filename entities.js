@@ -64,7 +64,7 @@ class Player {
   }
 
   update_speed() {
-    this.speed = 3 / this.rFactor;
+    this.speed = speed_base / this.rFactor;
   }
   update_damage() {
     let _difficulty = (difficulty in difficulty_modifiers) ? difficulty : 'normal';

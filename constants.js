@@ -160,15 +160,16 @@ const stats = {
 const teleportCoolDownTime = 1500;
 
 // --APPLES--
-const shrinking_factor = 0.2;
+const shrinking_factor = 0.15;
 const min_rFactor_apple = 0.01;
 const calc_new_rFactor = (apple_rFactor) => Math.max(1 - (shrinking_factor * apple_rFactor), min_rFactor_apple);
 
 // --PLAYER--
+const speed_base = 2.5;
 const starting_HP = 500;
 const starting_rFactor = 0.75;
 const starting_damage = 10.5;
-const starting_speed = 45;
+const starting_speed = speed_base/starting_rFactor;
 const min_rFactor = 0.4;
 
 // --WEAPONS--

@@ -397,7 +397,7 @@ function draw_player_projectiles(){
 }
 
 function player_anti_stuck(){
-  const steps = 25;
+  const steps = 2.5;
   if(pigeon.el.height < (you.y+you.r)){
     you.unscaled.y-=steps;
   }
