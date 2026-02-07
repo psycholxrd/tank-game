@@ -10,14 +10,32 @@ class Clock {
       snipe_enemy: 0,
       switch_weapon: 0,
     };
-
+    // to prevent cooldown cheats
+    const temp = {};
+    Object.defineProperties(temp, {
+        enemy_knock_damage: {
+          value: old60FPSCooldownToMilliseconds(40),
+          configurable: false,
+          writable: false,
+        },
+        shoot_enemy: {
+          value: old60FPSCooldownToMilliseconds(20),
+          configurable: false,
+          writable: false,
+        },
+        snipe_enemy: {
+          value: old60FPSCooldownToMilliseconds(45),
+          configurable: false,
+          writable: false,
+        },
+        switch_weapon: {
+          value: old60FPSCooldownToMilliseconds(500),
+          configurable: false,
+          writable: false,
+        },
+    });
     this.cd = {
-      default: {
-        enemy_knock_damage: old60FPSCooldownToMilliseconds(40),
-        shoot_enemy: old60FPSCooldownToMilliseconds(20),
-        snipe_enemy: old60FPSCooldownToMilliseconds(45),
-        switch_weapon: old60FPSCooldownToMilliseconds(500),
-      },
+      default: temp,
 
       locked: {
         get enemy_knock_damage() {
@@ -77,6 +95,8 @@ class Clock {
     }
   }
 }
+Object.freeze(Clock);
+Object.freeze(Clock.prototype);
 
 const clock = new Clock(); //define this globally
 
@@ -111,6 +131,8 @@ class ProjClock {
     return false;
   }
 }
+Object.freeze(ProjClock);
+Object.freeze(ProjClock.prototype);
 
 const freezing_time = 250;
 class FreezeClock{
@@ -126,6 +148,8 @@ class FreezeClock{
     return performance.now() <= this.timer;
   }
 }
+Object.freeze(FreezeClock);
+Object.freeze(FreezeClock.prototype);
 const freezeClock = new FreezeClock(freezing_time); //define this globally
 
 class BulletClock{
@@ -146,6 +170,8 @@ class BulletClock{
     requestAnimationFrame(() => {this.handle_dissapearing()});
   }
 }
+Object.freeze(BulletClock);
+Object.freeze(BulletClock.prototype);
 
 class WarningClock{
   constructor(flickeringTime, waitingTime, context){
@@ -213,3 +239,5 @@ class WarningClock{
     }
   }
 }
+Object.freeze(WarningClock);
+Object.freeze(WarningClock.prototype);

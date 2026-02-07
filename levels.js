@@ -1,17 +1,21 @@
+const bridge_key = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+(function() {
 const final_level = 10;
 const level_display = document.getElementById('level-display');
-let starting_time;
-let final_time;
-let paused_timestamp;
-let total_paused_time = 0;
-let game_completed = false;
-let game_active = false;
-let current_level = 1;
-let apples = [];
-let enemies = [];
-let projectiles = [];
-let player_projectiles = [];
-let proj_timers = [];
+const dynamic_elements = {
+  starting_time: null,
+  final_time: null,
+  paused_timestamp: null,
+  total_paused_time: 0,
+  game_completed: false,
+  game_active: false,
+  current_level: 1,
+};
+const apples = [];
+const enemies = [];
+const projectiles = [];
+const player_projectiles = [];
+const proj_timers = [];
 let default_levels = {
   //apple syntax: [x, y, radius] enemy syntax: [x, y, side length on grid 16x9, boss or slave, type]
   1: {
@@ -245,35 +249,35 @@ for(let num in default_levels){
 }
 
 function load_level(number) {
-  if(!game_active){
-    starting_time = performance.now();
+  if(!dynamic_elements.game_active){
+    dynamic_elements.starting_time = performance.now();
   }
   if(number == final_level){
-    final_time = performance.now()-starting_time-total_paused_time;
+    dynamic_elements.final_time = performance.now()-dynamic_elements.starting_time-dynamic_elements.total_paused_time;
     let last_best = localStorage.getItem('[Tanks] BestTime');
     if(last_best){
       let parsed = JSON.parse(last_best);
-      console.log(parsed, final_time);
-      if(parsed > final_time){
-        console.log('new best time!', msToTime(final_time));
-        localStorage.setItem('[Tanks] BestTime', final_time);
+      console.log(parsed, dynamic_elements.final_time);
+      if(parsed > dynamic_elements.final_time){
+        console.log('new best time!', msToTime(dynamic_elements.final_time));
+        localStorage.setItem('[Tanks] BestTime', dynamic_elements.final_time);
       }
     }else{
       console.log('new best time!');
-      localStorage.setItem('[Tanks] BestTime', final_time);
+      localStorage.setItem('[Tanks] BestTime', dynamic_elements.final_time);
     }
-    game_completed = true;
-    game_active = false;
+    dynamic_elements.game_completed = true;
+    dynamic_elements.game_active = false;
     return
   }
-  game_completed = false;
+  dynamic_elements.game_completed = false;
   apples.length = 0;
   enemies.length = 0;
   projectiles.length = 0;
   player_projectiles.length = 0;
   proj_timers.length = 0;
-  game_active = true;
-  current_level = number;
+  dynamic_elements.game_active = true;
+  dynamic_elements.current_level = number;
   level_display.innerText = `Level ${number}`;
   let l1 = levels[number].apples.length;
   let l2 = levels[number].enemies.length;
@@ -303,3 +307,19 @@ function load_level(number) {
     enemies.push(temp_enemy); //[2] twice, because square
   }
 }
+
+window[bridge_key] = {
+  final_level,
+  level_display,
+  dynamic_elements,
+  apples,
+  enemies,
+  projectiles,
+  player_projectiles,
+  proj_timers,
+  default_levels,
+  levels,
+  load_level,
+  deepCloneLevel,
+};
+})();

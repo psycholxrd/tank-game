@@ -32,13 +32,13 @@ class Laser extends Weapon{
         return (this.owner.damage * 100) / this.rgb_value;
     }
     draw(){
-        let rgb_val = laser.rgb_value;
+        let rgb_val = this.rgb_value;
         let rgb = [rgb_val, rgb_val, rgb_val];
-        you.update_color(...rgb);
+        this.owner.update_color(...rgb);
         c.begin();
-        c.set_property("lineWidth", 1000 / laser.rgb_value);
-        c.set_property("strokeStyle", you.color);
-        c.moveTo(you.x, you.y);
+        c.set_property("lineWidth", 1000 / this.rgb_value);
+        c.set_property("strokeStyle", this.owner.color);
+        c.moveTo(this.owner.x, this.owner.y);
         c.lineTo(mouse.x, mouse.y);
         c.stroke();
 
@@ -46,17 +46,17 @@ class Laser extends Weapon{
         c.set_property("lineWidth", 5);
         c.set_property(
             "strokeStyle",
-            clock.cd.locked[laser.reloadKey] ? "darkred" : "lime"
+            clock.cd.locked[this.reloadKey] ? "darkred" : "lime"
         );
         let _100percent = 2 * Math.PI;
         let _current_percent =
-        (clock.cd.current[laser.reloadKey] / clock.cd.default[laser.reloadKey]) * 100;
+        (clock.cd.current[this.reloadKey] / clock.cd.default[this.reloadKey]) * 100;
         c.arc(
             mouse.x,
             mouse.y,
             u / 2,
             0,
-            clock.cd.locked[laser.reloadKey]
+            clock.cd.locked[this.reloadKey]
             ? (_100percent / 100) * _current_percent
             : _100percent
         );

@@ -11,7 +11,7 @@ class Vector2D{
         return this._start;
     }
     set start(new_start){
-        if(new_start instanceof Array && new_start.length === 2 && typeof new_end[0] === 'number' && typeof new_end[1] === 'number'){
+        if(new_start instanceof Array && new_start.length === 2 && typeof new_start[0] === 'number' && typeof new_start[1] === 'number'){
             this._start = new_start;
         }else{
             console.warn('INVALID VALUE FOR START');

@@ -1,5 +1,9 @@
 class Player {
   constructor(radius, start_x, start_y, selected_weapon = "Laser") {
+    const self = this;
+    const get_spawn_point = () => {
+      return {x: u*2, y: u*7};
+    };
     let _difficulty = (difficulty in difficulty_modifiers) ? difficulty : 'normal';
     let _selected_weapon = weapon_types.includes(selected_weapon) ? selected_weapon : "Laser";
     this.selected_weapon = _selected_weapon;
@@ -8,14 +12,37 @@ class Player {
     this.damage;
     this.r = radius;
     this._rFactor = starting_rFactor;
-    this.unscaled = {
-      x: start_x,
-      y: start_y,
-    };
     this.x, this.y;
     this.xOffset = 0;
     this.yOffset = 0;
     this.speed = starting_speed;
+    //proxied against cheating
+    this.unscaled = new Proxy({
+      x: start_x,
+      y: start_y,
+    }, {
+      set(target, prop, value, receiver) {
+        const lenX = Math.abs(self.xOffset * self.speed);
+        const lenY = Math.abs(self.yOffset * self.speed);
+        const s = get_spawn_point();
+        switch(prop) {
+          case 'x':
+            if ((value > target[prop] + lenX || value < target[prop] - lenX) && value !== s.x){
+              console.warn("Invalid x movement detected", value > target[prop] + lenX);
+              return true;
+            }
+            break;
+          case 'y':
+            if ((value > target[prop] + lenY || value < target[prop] - lenY) && value !== s.y){
+              console.warn("Invalid y movement detected");
+              return true;
+            }
+            break;
+        }
+        target[prop] = value;
+        return true;
+      },
+    });
     this.playerColor = "yellow";
     this.damageColor = "darkred";
     this.freezeColor = "blue";
@@ -26,6 +53,49 @@ class Player {
         this.switch_weapon();
       }
     })
+    // -- PROXY START --
+    return new Proxy(this, {
+      set(target, prop, value, receiver) {
+        //functions
+        if (typeof target[prop] === 'function') {
+          console.warn(`Attempt to overwrite method "${prop}" blocked.`);
+          return false; 
+        }
+        //properties
+        switch(prop) {
+          case 'speed':
+            if (value !== speed_base / target.rFactor) {
+              console.warn("Invalid speed detected");
+              return true;
+            }
+            break;
+          case '_hp':
+            if(starting_HP * difficulty_modifiers[_difficulty].playerHP*3 < value) {
+              console.warn("Invalid HP detected");
+              return true;
+            }
+            break;
+          case '_rFactor':
+            if(value < min_rFactor) {
+              console.warn("Invalid rFactor detected");
+              return true;
+            }
+            break;
+        }
+        target[prop] = value;
+        return true;
+        //return Reflect.set(target, prop, value, receiver);
+      },
+      get(target, prop, receiver) {
+        const value = Reflect.get(target, prop, receiver);
+        
+        if (typeof value === 'function') {
+          return value.bind(target);
+        }
+        return value;
+      }
+    });
+    // -- PROXY END --
   }
   //limitations
   set hp(value){
@@ -33,13 +103,14 @@ class Player {
     this._hp = Math.min(value, starting_HP * difficulty_modifiers[_difficulty].playerHP*3);
   }
   get hp(){
-    return this._hp;
+    let _difficulty = (difficulty in difficulty_modifiers) ? difficulty : 'normal';
+    return Math.min(this._hp, starting_HP * difficulty_modifiers[_difficulty].playerHP*3);
   }
   set rFactor(value){
     this._rFactor = Math.max(value, min_rFactor);
   }
   get rFactor(){
-    return this._rFactor;
+    return Math.max(this._rFactor, min_rFactor);
   }
   switch_weapon(){
     if(!clock.cd.locked.switch_weapon){
@@ -83,12 +154,23 @@ class Apple {
     this.unit = unit;
     this.r = 1;
     this.rFactor = rFactor;
-    this.unscaled = {
+    this.unscaled = new Proxy({
       x: x,
       y: y,
-    };
+    }, {
+      set(...args){
+        return false; //apples are static, so no changes allowed.
+      }
+    });
     this.x, this.y;
     this.color = "red";
+    return new Proxy(this, {
+      set(target, prop, value, receiver) {
+        if (prop === 'unscaled' || prop === 'rFactor') return false;
+        target[prop] = value;
+        return true;
+      }
+    });
   }
   update_values() {
     let unit = this.unit === 'u' ? u : this.unit === 'u2' ? u2 : 1;
@@ -109,12 +191,16 @@ class Enemy {
     this.is_Boss = false;
     this.is_Slave = false;
     this.type = (type in stats) ? type : 'Default';
-    this.unscaled = {
+    this.unscaled = new Proxy({
       x: x,
       y: y,
       w: w,
       h: h,
-    };
+    }, {
+      set(...args){
+        return false; //enemies are static, so no changes allowed.
+      }
+    })
     this.projectile_directions = stats[this.type].projectile_directions;
     this.last_direction = stats[this.type].last_direction;
     this.projectile_type = stats[this.type].projectile_type;

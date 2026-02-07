@@ -11,30 +11,30 @@
       <div id = "menu-container">
         <h1 class = "menu-big-text">Tanks Game (by r!PsAw)</h1>
         <p class = "menu-text" id = "chosen-difficulty">Difficulty: Normal</p>
-        <div class = "menu-btn" id = "Start-btn" onclick = start_game()>Start</div>
-        <div class = "menu-btn" id = "Difficulty-btn" onclick = open_difficulties()>Change Difficulty</div>
-        <div class = "menu-btn" id = "Level-Editor-btn" onclick = open_level_selector()>Level Editor</div>
-        <div class = "menu-btn" id = "How-to-Play-btn" onclick = open_how_to_play()>How to Play</div>
+        <div class = "menu-btn" id = "Start-btn">Start</div>
+        <div class = "menu-btn" id = "Difficulty-btn">Change Difficulty</div>
+        <div class = "menu-btn" id = "Level-Editor-btn">Level Editor</div>
+        <div class = "menu-btn" id = "How-to-Play-btn">How to Play</div>
         <b class = "menu-text" id = "highscore">Best Time: -</b>
       </div>
       <div id = "game-container">
         <div id = "game-header">
           <div id = "timer">00:00:00</div>
           <div id = "level-display">Level 1</div>
-          <button id = "pause-btn" onclick=handlePause()>||</button>
+          <button id = "pause-btn">||</button>
         </div>
         <canvas id="canvas"></canvas>
         <div id = "paused-cont">
           <div id = "dimmer"></div>
-          <div class = "paused-btn" onclick = handleUnpause()>Resume</div>
-          <div class = "paused-btn" onclick = quitMidGame()>Return to title</div>
+          <div class = "paused-btn" id = "unpause-btn">Resume</div>
+          <div class = "paused-btn" id = "quit-btn">Return to title</div>
         </div>
       </div>
       <div id = "difficulty-container">
         <b class = "difficulty-text">Select Difficulty:</b>
-        <div class = "difficulty-btn" onclick = setEasyDifficulty()> Easy</div>
-        <div class = "difficulty-btn" onclick = setNormalDifficulty()> Normal</div>
-        <div class = "difficulty-btn" onclick = setHardDifficulty()> Hard</div>
+        <div class = "difficulty-btn" id = "Easy-btn"> Easy</div>
+        <div class = "difficulty-btn" id = "Normal-btn"> Normal</div>
+        <div class = "difficulty-btn" id = "Hard-btn"> Hard</div>
       </div>
       <div id = "level-selector-container">
         <b class = "level-selector-text">Select a level, you want to edit:</b>
@@ -49,13 +49,13 @@
           <a class = "level-editor-text">Grid Intensity</a>
           <input type = "range" min = "1" max = "4" value = "4" id = "grid-intensity"></input>
           <b class = "level-editor-text">Level changes:</b>
-          <div class = "level-editor-btn" onclick = export_level()>Export level</div>
-          <div class = "level-editor-btn" onclick = import_level()>Import level</div>
-          <div class = "level-editor-btn" onclick = remember_level()>Remember level</div>
-          <div class = "level-editor-btn" onclick = forget_level()>Forget level</div>
-          <div class = "level-editor-btn" onclick = reset_level()>Reset to default</div>
+          <div class = "level-editor-btn" id = "Export-level-btn">Export level</div>
+          <div class = "level-editor-btn" id = "Import-level-btn">Import level</div>
+          <div class = "level-editor-btn" id = "Remember-level-btn">Remember level</div>
+          <div class = "level-editor-btn" id = "Forget-level-btn">Forget level</div>
+          <div class = "level-editor-btn" id = "Reset-level-btn">Reset to default</div>
           <b class = "level-editor-text">Other:</b>
-          <div class = "level-editor-btn" onclick = open_level_selector()>Return to Selector</div>
+          <div class = "level-editor-btn" id = "Return-to-selector-btn">Return to Selector</div>
         </div>
       </div>
       <div id = "how-to-play-container">
@@ -133,9 +133,9 @@
               your initial health.
             </b>
           </div>
-          <div id = "next-instruction-btn" onclick = next_instruction()>Next</div>
+          <div id = "next-instruction-btn">Next</div>
         </div>
-        <div id = "how-to-play-return-btn" onclick = return_to_menu_from_how_to_play()>Return to Menu</div>
+        <div id = "how-to-play-return-btn">Return to Menu</div>
       </div>
     </div>
   </body>
