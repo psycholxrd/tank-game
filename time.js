@@ -69,6 +69,16 @@ class Clock {
         _parent: this
       }
     };
+    const self = this;
+    this._expiresAt = new Proxy(this._expiresAt, {
+      set(target, prop, value, receiver) {
+        if(self.cd.locked[prop]) {
+          console.warn(`Attempted to set ${prop} cooldown while it's still active. This is not allowed.`);
+          return false; // prevent the assignment
+        }
+        return Reflect.set(target, prop, value, receiver);
+      }
+    });
   }
 
   enemy_knock_damage() {

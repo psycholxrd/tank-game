@@ -14,6 +14,8 @@ class Weapon{
         return this._damage;
     }
 }
+Object.freeze(Weapon);
+Object.freeze(Weapon.prototype);
 
 class Laser extends Weapon{
     constructor(owner){
@@ -63,6 +65,8 @@ class Laser extends Weapon{
         c.stroke();
     }
 }
+Object.freeze(Laser);
+Object.freeze(Laser.prototype);
 
 class Sniper extends Weapon{
     constructor(owner){
@@ -102,3 +106,5 @@ class Sniper extends Weapon{
         c.stroke();
     }
 }
+Object.freeze(Sniper);
+Object.freeze(Sniper.prototype);

@@ -89,6 +89,8 @@ class Canvas {
     return this.ctx[property];
   }
 }
+Object.freeze(Canvas);
+Object.freeze(Canvas.prototype);
 
 const c = new Canvas(pigeon.el, pigeon.get_ctx());
 let editor_canvas = document.getElementById("level-editor-canvas");

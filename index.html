@@ -5,6 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
     <link rel="stylesheet" href="styles.css" />
+    <script>
+      function freeze(obj){
+        Object.freeze(obj);
+        if(obj.prototype) Object.freeze(obj.prototype);
+      };
+      freeze(Array);
+      freeze(Math);
+      freeze(CanvasRenderingContext2D);
+      freeze(HTMLCanvasElement);
+      freeze(Function);
+    </script>
   </head>
   <body>
     <div class = "container">

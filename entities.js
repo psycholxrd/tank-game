@@ -148,6 +148,8 @@ class Player {
     this.color = `rgb(${r}, ${g}, ${b})`;
   }
 }
+Object.freeze(Player);
+Object.freeze(Player.prototype);
 
 class Apple {
   constructor(x, y, rFactor = 0.1, unit='u') {
@@ -179,6 +181,8 @@ class Apple {
     this.y = this.unscaled.y * unit;
   }
 }
+Object.freeze(Apple);
+Object.freeze(Apple.prototype);
 
 class Enemy {
   constructor(x, y, w, h, type = "Crier", unit = 'u') {
@@ -244,6 +248,8 @@ class Enemy {
     };
   }
 }
+Object.freeze(Enemy);
+Object.freeze(Enemy.prototype);
 
 class Projectile {
   constructor(type, direction, unscaled_coords, rFactor, rScale, damage, bouncy = false, bounceTime = 10000, wavy = false, frequency = 1, amplitude = 1) {
@@ -399,3 +405,5 @@ class PlayerProjectile{
     c.fill();
   }
 }
+Object.freeze(PlayerProjectile);
+Object.freeze(PlayerProjectile.prototype);
