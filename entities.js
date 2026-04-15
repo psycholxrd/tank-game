@@ -1,5 +1,6 @@
 class Player {
-  constructor(radius, start_x, start_y, selected_weapon = "Laser") {
+  constructor(radius, start_x, start_y, skin, selected_weapon = "Laser", unit = 'u') {
+    this.unit = unit;
     const self = this;
     const get_spawn_point = () => {
       return {x: u*2, y: u*7};
@@ -10,6 +11,9 @@ class Player {
     this._hp = starting_HP * difficulty_modifiers[_difficulty].playerHP;
     //this.damage = starting_damage * difficulty_modifiers[_difficulty].playerDamage;
     this.damage;
+    this.skin = skin;
+    this.trail = 'None';
+    this.trails = [];
     this.r = radius;
     this._rFactor = starting_rFactor;
     this.x, this.y;
@@ -43,10 +47,8 @@ class Player {
         return true;
       },
     });
-    this.playerColor = "yellow";
-    this.damageColor = "darkred";
-    this.freezeColor = "blue";
-    this.activeColor = this.playerColor;
+    const _skin = this.skin in player_skin_colors ? this.skin : 'Default';
+    this.activeColor = player_skin_colors[_skin].innerBody;
     this.color = "rgb(0, 0, 0)"; //line color
     window.addEventListener('keydown', (e) => {
       if(e.code === "ShiftLeft" || e.code === "ShiftRight"){
@@ -119,10 +121,12 @@ class Player {
     }
   }
   correct_spawn_point(){
-    this.unscaled.x = u * 2;
-    this.unscaled.y = u * 7;
+    let unit = this.unit === 'u' ? u : this.unit === 'u2' ? u2 : 1;
+    this.unscaled.x = unit * 2;
+    this.unscaled.y = unit * 7;
   }
   update_pos() {
+    let unit = this.unit === 'u' ? u : this.unit === 'u2' ? u2 : 1;
     if(this.xOffset != 0 && this.yOffset != 0){
       const neg_sqrt = (x) => Math.sign(x) * Math.sqrt(Math.abs(x));
       this.xOffset = neg_sqrt(this.xOffset);
@@ -130,8 +134,8 @@ class Player {
     }
     this.unscaled.x += this.xOffset * this.speed;
     this.unscaled.y += this.yOffset * this.speed;
-    this.x = (this.unscaled.x * u) / 100;
-    this.y = (this.unscaled.y * u) / 100;
+    this.x = (this.unscaled.x * unit) / 100;
+    this.y = (this.unscaled.y * unit) / 100;
   }
 
   update_speed() {
@@ -142,7 +146,8 @@ class Player {
     this.damage = (starting_damage * difficulty_modifiers[_difficulty].playerDamage) / (this.rFactor * 1.425);
   }
   update_radius() {
-    this.r = u * this.rFactor;
+    let unit = this.unit === 'u' ? u : this.unit === 'u2' ? u2 : 1;
+    this.r = unit * this.rFactor;
   }
   update_color(r, g, b) {
     this.color = `rgb(${r}, ${g}, ${b})`;
@@ -407,3 +412,43 @@ class PlayerProjectile{
 }
 Object.freeze(PlayerProjectile);
 Object.freeze(PlayerProjectile.prototype);
+
+class Trail {
+  constructor(owner, livingTime=1200) {
+    this.unit = owner.unit;
+    let _unit = this.unit === 'u' ? u : this.unit === 'u2' ? u2 : 1;
+    this.type = owner.trail;
+    this.owner = owner;
+    const posOrNeg = () => Math.random() < 0.5 ? -1 : 1;
+    this.unscaled = {
+      x: this.owner.unscaled.x,
+      y: this.owner.unscaled.y,
+    };
+    this.factor = 0.35;
+    this.clock = new TrailClock(livingTime, this);
+    this.maxOffsetSpeed = 4.75;
+    this.unscaledDirection = {
+      x: Math.floor(Math.random()*this.maxOffsetSpeed) * posOrNeg(),
+      y: Math.floor(Math.random()*this.maxOffsetSpeed) * posOrNeg(),
+    };
+  }
+  get x(){
+    let unit = this.unit === 'u' ? u : this.unit === 'u2' ? u2 : 1;
+    return (this.unscaled.x * unit)/100;
+  }
+  get y(){
+    let unit = this.unit === 'u' ? u : this.unit === 'u2' ? u2 : 1;
+    return (this.unscaled.y * unit)/100;
+  }
+  get r(){
+    if(this.factor < 0.1) return 0;
+    return this.owner.r * this.factor;
+  }
+  update_offsets(){
+    this.unscaled.x = this.unscaled.x + this.unscaledDirection.x;
+    this.unscaled.y = this.unscaled.y + this.unscaledDirection.y;
+    if(this.factor > 0.1) this.factor -= 0.01;
+  }
+}
+Object.freeze(Trail);
+Object.freeze(Trail.prototype);

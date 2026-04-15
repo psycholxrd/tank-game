@@ -1,15 +1,4 @@
 (function() {
-  /*
-  const dynamic_elements = {
-  starting_time: null,
-  final_time: null,
-  paused_timestamp: null,
-  total_paused_time: 0,
-  game_completed: false,
-  game_active: false,
-  current_level: 1,
-};
-  */
  let final_level, level_display, dynamic_elements, apples, enemies, projectiles, player_projectiles, proj_timers, default_levels, levels, load_level, deepCloneLevel;
   function async_a(){
     if(window[bridge_key]){
@@ -32,7 +21,64 @@
     }
   }
   async_a();
+  //ENCRYPTION START
+  const symbols = "0123456789qwertyuiop[]asdfghjkl;xcvbnm,.!@#$%^&*()_+-=QWERTYUIOPASDFGHJKL:ZXCVBNM<>?¡™£¢∞§¶•ªº–≠œ∑´®†¥¨ˆøπ“‘åß∂ƒ©˙∆˚¬…æ«Ω≈ç√∫˜µ≤≥÷⁄€‹›ﬁﬂ‡°·‚—±Œ„‰ˇÁØ∏”’ÅÍÎÏ˝ÓÔÒÚÆ»`¸˛Ç◊ıÂ¯˘¿àáâäǎãāćčċďðèéêëěẽēėęğġħìíîïǐĩīįķłļľñńņňòóôöǒõōřşșśšțťþùúûüǔũūűůŵýŷÿźžżȦḂḊḞĠḢṀṄṖṠṪẆ";
+
+  function encrypt(number) {
+    const maxNumber = Math.pow(20, 10) - 1; 
+    if (number > maxNumber || number < 0) throw new TypeError('Number out of bounds');
+    let _20 = number.toString(20).padStart(10, '0');
+    let arr = new Uint8Array(12);
+    arr[0] = Math.floor(Math.random() * 20);
+    for (let i = 0; i < 10; i++) {
+        arr[i + 1] = (arr[0] * i) + parseInt(_20[i], 20); 
+    }
+
+    let sum = 0;
+    for (let i = 0; i < 11; i++) sum += arr[i];
+    arr[11] = sum % 255; 
+    let encrypted = '';
+    for (let i = 0; i < 12; i++) {
+        encrypted += symbols[arr[i]];
+    }
+    return encrypted;
+  }
+
+  function decrypt(str) {
+    if (!str || str.length !== 12) return null;
+    let arr = new Uint8Array(12);
+    for (let i = 0; i < 12; i++) {
+        const index = symbols.indexOf(str[i]);
+        if (index === -1) return null;
+        arr[i] = index;
+    }
+    let sum = 0;
+    for (let i = 0; i < 11; i++) sum += arr[i];
+    if (arr[11] !== (sum % 255)) {
+        console.warn("Save data tampered with!");
+        return null;
+    }
+    let base20 = "";
+    const seed = arr[0];
+    for (let i = 0; i < 10; i++) {
+        const digitValue = arr[i + 1] - (seed * i);
+        base20 += digitValue.toString(20);
+    }
+
+    return parseInt(base20, 20);
+  }
+
+  function string_to_encrypted(str){
+    return str.split('').map(char => encrypt(char.charCodeAt(0)));
+  };
+
+  function encrypted_to_string(arr){
+    return arr.map(num => String.fromCharCode(decrypt(num))).join('');
+  };
+  //ENCRYPTION END
   const timer = document.getElementById("timer");
+  const shop_wrapper = document.getElementById("shop-wrapper");
+  const shop_cont = document.getElementById("shop-container");
   const menu_cont = document.getElementById("menu-container");
   const difficulty_cont = document.getElementById("difficulty-container");
   const chosen_difficulty = document.getElementById("chosen-difficulty");
@@ -44,13 +90,16 @@
   const entity_panel = document.getElementById("entity-panel");
   const grid_slider = document.getElementById("grid-intensity");
   const how_to_play_cont = document.getElementById("how-to-play-container");
+  const coins_count = document.getElementById("coin-count");
+  const shop_btn = document.getElementById("shop-btn");
+
   const get_spawn_point = () => {
     return {
       x: u * 2,
       y: u * 7
     };
   };
-  const you = new Player(u / 2, get_spawn_point().x, get_spawn_point().y, "Laser");
+  const you = new Player(u / 2, get_spawn_point().x, get_spawn_point().y, "Default", "Laser");
   const laser = new Laser(you);
   const sniper = new Sniper(you);
   const defaultFPS = 60;
@@ -384,9 +433,9 @@
       you.hp -= enemy_knock_damage;
     }
     if (clock.cd.locked.enemy_knock_damage) {
-      you.activeColor = you.damageColor;
+      you.activeColor = player_skin_colors[you.skin].damaged;
     } else {
-      you.activeColor = you.playerColor;
+      you.activeColor = player_skin_colors[you.skin].innerBody;
     }
   }
 
@@ -462,11 +511,14 @@
         setTime(ms_passed);
       }
     }
+    filter_trails();
+    update_trails();
     updatePlayerColor();
     set_source();
     c.clear();
     c.begin();
     c.ctx.drawImage(img, 0, 0, pigeon.w, pigeon.h);
+    draw_trails();
     draw_tank();
     update_player_projectiles();
     draw_player_projectiles();
@@ -511,6 +563,10 @@
     }
   }
 
+  function draw_trails(){
+    you.trails.forEach(trail => draw_player_trail(trail, c));
+  }
+
   function draw_tank() {
     you.update_radius();
     you.update_speed();
@@ -526,13 +582,7 @@
         break;
     }
 
-    c.begin();
-    c.set_property("fillStyle", you.activeColor);
-    c.arc(you.x, you.y, you.r, 0, 2 * Math.PI);
-    c.fill();
-    c.set_property("strokeStyle", "darkorange");
-    c.set_property("lineWidth", 2.5);
-    c.stroke();
+    draw_player_skin(you, c);
 
     //draw weapon cooldown
     set_weapon_src();
@@ -805,14 +855,27 @@
 
   function updatePlayerColor() {
     if (freezeClock.is_frozen()) {
-      you.activeColor = you.freezeColor;
+      you.activeColor = player_skin_colors[you.skin].frozen;
     } else if (clock.cd.locked.enemy_knock_damage) {
-      you.activeColor = you.damageColor;
+      you.activeColor = player_skin_colors[you.skin].damaged;
     } else {
-      you.activeColor = you.playerColor;
+      you.activeColor = player_skin_colors[you.skin].innerBody;
     }
   }
 
+  function create_trail(_unit){
+    const trail = new Trail(you, 1200, _unit);
+    trail.clock.start();
+    you.trails.push(trail);
+  }
+
+  function filter_trails(){
+    you.trails = you.trails.filter(trail => trail.clock.state !== 'EXPIRED');
+  }
+
+  function update_trails(){
+    you.trails.forEach(trail => trail.update_offsets());
+  }
 
   function is_player_outside_canvas(side) {
     let _barrier;
@@ -894,6 +957,7 @@
   //shooting logic
   function apply_shoot_enemy(_x, _y) {
     for (let enemy of enemies) {
+      if(enemy.corners === undefined) continue;
       if (
         _x > enemy.corners.lu.x &&
         _x < enemy.corners.rd.x &&
@@ -976,13 +1040,13 @@
   }
 
   document.addEventListener("mousedown", (e) => {
-    if (e.button !== 0) return;
+    if (e.button !== 0 || !active_screen === "game") return;
     switch (you.selected_weapon) {
       case "Laser":
         if (!clock.cd.locked[laser.reloadKey]) apply_shoot_enemy(e.clientX, e.clientY);
         break
       case "Sniper":
-        if (!clock.cd.locked[sniper.reloadKey] && active_screen === "game") apply_snipe_enemy();
+        if (!clock.cd.locked[sniper.reloadKey]) apply_snipe_enemy();
         break;
     }
   });
@@ -992,8 +1056,9 @@
   });
 
   //screen changer
-  const allowed_screens = ['menu', 'game', 'difficulty', 'level-selector', 'level-editor', 'how-to-play', 'game-completed'];
+  const allowed_screens = ['shop', 'menu', 'game', 'difficulty', 'level-selector', 'level-editor', 'how-to-play', 'game-completed'];
   const screen_displays = {
+    'shop': 'flex',
     'menu': 'flex',
     'game': 'block',
     'difficulty': 'flex',
@@ -1003,6 +1068,7 @@
     'game-completed': 'block'
   }
   const screen_containers = {
+    'shop': shop_cont,
     'menu': menu_cont,
     'game': game_cont,
     'difficulty': difficulty_cont,
@@ -1016,16 +1082,337 @@
     if (!allowed_screens.includes(new_screen)) return console.warn(new_screen + ' is not allowed!');
     screen_containers[active_screen].style.display = 'none';
     screen_containers[new_screen].style.display = screen_displays[new_screen];
+    if(new_screen === 'game') {
+      shop_wrapper.style.display = 'none';
+    }else{
+      shop_wrapper.style.display = 'flex';
+    }
     active_screen = new_screen;
+  }
+
+  //shop data (don't expose this)
+  const shop_items = {
+    player_skins: {
+      'Default': {
+        price: 0,
+        selected: true,
+        owned: true,
+      },
+      'Golem': {
+        price: 20,
+        selected: false,
+        owned: false,
+      },
+      'Alien': {
+        price: 20,
+        selected: false,
+        owned: false,
+      },
+      'Football': {
+        price: 20,
+        selected: false,
+        owned: false,
+      },
+      'Beast': {
+        price: 50,
+        selected: false,
+        owned: false,
+      },
+      'trollface': {
+        price: 50,
+        selected: false,
+        owned: false,
+      },
+      'Goth Girl': {
+        price: 100,
+        selected: false,
+        owned: false,
+      }
+    },
+    player_trails: {
+      'None': {
+        price: 0,
+        selected: true,
+        owned: true,
+      },
+      'Stone': {
+        price: 15,
+        selected: false,
+        owned: false,
+      },
+      'Ufo': {
+        price: 15,
+        selected: false,
+        owned: false,
+      },
+      'Dirt': {
+        price: 15,
+        selected: false,
+        owned: false,
+      },
+      'Claws': {
+        price: 40,
+        selected: false,
+        owned: false,
+      },
+      'XD': {
+        price: 40,
+        selected: false,
+        owned: false,
+      },
+      'Skull': {
+        price: 80,
+        selected: false,
+        owned: false,
+      },
+    },
+  //weapon skins maybe?
+  };
+  //coins
+  let coins = decrypt(localStorage.getItem('[Tanks] Coins')) || 0;
+  const raw_saved_owned_skins = localStorage.getItem('[Tanks] Owned Skins');
+  const raw_saved_owned_trails = localStorage.getItem('[Tanks] Owned Trails');
+  const owned_skins = raw_saved_owned_skins === null ? [] : JSON.parse(raw_saved_owned_skins).map(skinString => encrypted_to_string(skinString));
+  const owned_trails = raw_saved_owned_trails === null ? [] : JSON.parse(raw_saved_owned_trails).map(trailString => encrypted_to_string(trailString));
+  //update based on saved
+  for(let skin in shop_items.player_skins) {
+    if(owned_skins.includes(skin)) {
+      shop_items.player_skins[skin].owned = true;
+    }
+  }
+  for(let trail in shop_items.player_trails) {
+    if(owned_trails.includes(trail)) {
+      shop_items.player_trails[trail].owned = true;
+    }
+  }
+
+  function save_owned_items() {
+    const skins_to_save = [];
+    const trails_to_save = [];
+    for(let skin in shop_items.player_skins) {
+      if(shop_items.player_skins[skin].owned) {
+        skins_to_save.push(string_to_encrypted(skin));
+      }
+    }
+    for(let trail in shop_items.player_trails) {
+      if(shop_items.player_trails[trail].owned) {
+        trails_to_save.push(string_to_encrypted(trail));
+      }
+    }
+    localStorage.setItem('[Tanks] Owned Skins', JSON.stringify(skins_to_save));
+    localStorage.setItem('[Tanks] Owned Trails', JSON.stringify(trails_to_save));
+  }
+
+  function update_coins(value){
+    coins = value;
+    localStorage.setItem('[Tanks] Coins', encrypt(coins));
+    coins_count.innerHTML = coins;
+  }
+
+  update_coins(coins);
+  shop_btn.addEventListener('mousedown', (e) => {
+    if (e.button === 0) {
+      change_screen('shop');
+    }
+  });
+
+  // actual shop setup
+  const shop_back_btn = document.querySelector('#shop-back-btn');
+  shop_back_btn.addEventListener('mousedown', (e) => {
+    if (e.button === 0) {
+      change_screen('menu');
+    }
+  });
+  const shop_items_wrapper = document.querySelector('#shop-items-wrapper');
+  const shop_items_elements = [];
+  function createShopItem(name, type, price) {
+    const suffix = type.replace('player_', '').slice(0, -1);
+    const obj = shop_items[type][name];
+    const item = document.createElement('div');
+    item.style.display = 'flex';
+    item.style.flexDirection = 'column';
+    item.style.alignItems = 'center';
+    item.style.justifyContent = 'space-between';
+    item.style.border = `4px solid ${obj.owned ? 'black' : 'gray'}`;
+    item.style.borderRadius = '8px';
+    item.style.padding = '16px';
+    item.style.backgroundColor = obj.owned ? obj.selected ? "MediumVioletRed" : "RebeccaPurple" : '#333';
+    item.style.width = '200px';
+    item.style.minHeight = '280px';
+    item.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.3)';
+    
+    const title = document.createElement('h3');
+    title.innerHTML = `${name} ${suffix}`;
+    title.style.margin = '0 0 12px 0';
+    title.style.fontSize = '18px';
+    title.style.color = '#fff';
+    title.style.textAlign = 'center';
+    
+    const previewCanvas = document.createElement('canvas');
+    previewCanvas.width = 120;
+    previewCanvas.height = 120;
+    previewCanvas.style.border = '1px solid #666';
+    previewCanvas.style.borderRadius = '4px';
+    previewCanvas.style.backgroundColor = '#111';
+    previewCanvas.style.marginBottom = '12px';
+    previewCanvas.style.cursor = 'default';
+    const previewCanvasCtx = previewCanvas.getContext('2d');
+    const canvasWrapper = new Canvas(previewCanvas, previewCanvasCtx);
+    item.canvas = canvasWrapper;
+    if (type === 'player_skins') {
+      const _player = new Player(previewCanvas.width/3, previewCanvas.width / 2, previewCanvas.height / 2, name, 'Laser', 1);
+      _player.x = _player.unscaled.x;
+      _player.y = _player.unscaled.y;
+      draw_player_skin(_player, canvasWrapper);
+    }else if (type === 'player_trails') {
+      const _trail = new Trail({unscaled: {x: (previewCanvas.width / 2) * 100, y: (previewCanvas.height / 2) * 100}, trail: name, r: previewCanvas.width/2, unit: 1}, 1200, name);
+      draw_player_trail(_trail, canvasWrapper);
+    };
+    const priceTag = document.createElement('p');
+    priceTag.innerHTML = `&nbsp;<br>Price: ${price} coins`;
+    priceTag.style.margin = '8px 0';
+    priceTag.style.fontSize = '14px';
+    priceTag.style.color = '#ffd700';
+    priceTag.style.textAlign = 'center';
+
+    const selectBtn = document.createElement('button');
+    selectBtn.innerHTML = obj.selected ? 'Selected' : 'Select';
+    selectBtn.style.padding = '10px 20px';
+    selectBtn.style.fontSize = '14px';
+    selectBtn.style.marginBottom = '8px';
+    selectBtn.style.border = 'none';
+    selectBtn.style.borderRadius = '4px';
+    selectBtn.style.backgroundColor = '#008CBA';
+    selectBtn.style.color = 'white';
+    selectBtn.style.cursor = obj.owned ? 'pointer' : 'default';
+    selectBtn.style.width = '100%';
+    selectBtn.style.transition = 'background-color 0.2s';
+    selectBtn.addEventListener('mousedown', () => {
+      if (obj.owned) {
+        //deselect all other items of the same type
+        for (let other_name in shop_items[type]) {
+          shop_items[type][other_name].selected = false;
+        }
+        if(type === 'player_skins') {
+          you.skin = name;
+        }else if(type === 'player_trails') {
+          you.trail = name;
+        };
+        
+        // Update only items of the same type
+        for(let elem of shop_items_elements) {
+          if(elem.dataset.type === type && shop_items[type][elem.dataset.name].owned) {
+            const elemSelectBtn = elem.querySelector('button');
+            if(elem === item) {
+              elemSelectBtn.innerHTML = 'Selected';
+              elemSelectBtn.style.backgroundColor = '#005f73';
+              elemSelectBtn.style.cursor = 'default';
+              elem.style.backgroundColor = 'MediumVioletRed';
+            } else {
+              elemSelectBtn.innerHTML = 'Select';
+              elemSelectBtn.style.backgroundColor = '#008CBA';
+              elemSelectBtn.style.cursor = 'pointer';
+              elem.style.backgroundColor = 'RebeccaPurple';
+            }
+          }
+        }
+        obj.selected = true;
+      }
+    });
+    selectBtn.addEventListener('mouseenter', () => {
+      if (obj.owned) {
+        selectBtn.style.backgroundColor = '#005f73';
+      }
+    });
+    selectBtn.addEventListener('mouseleave', () => {
+      if (obj.owned) {
+        selectBtn.style.backgroundColor = obj.selected ? '#005f73' : '#008CBA';
+      }
+    });
+    
+    if (obj.selected) {
+      selectBtn.style.backgroundColor = '#005f73';
+      selectBtn.style.cursor = 'default';
+    }
+    
+    const buyBtn = document.createElement('button');
+    buyBtn.innerHTML = 'Buy';
+    buyBtn.style.padding = '10px 20px';
+    buyBtn.style.fontSize = '14px';
+    buyBtn.style.border = 'none';
+    buyBtn.style.borderRadius = '4px';
+    buyBtn.style.backgroundColor = '#4CAF50';
+    buyBtn.style.color = 'white';
+    buyBtn.style.cursor = 'pointer';
+    buyBtn.style.width = '100%';
+    buyBtn.style.transition = 'background-color 0.2s';
+    buyBtn.addEventListener('mousedown', () => {
+      if (coins >= price) {
+        update_coins(coins - price);
+        obj.owned = true;
+        save_owned_items();
+        item.style.backgroundColor = 'RebeccaPurple';
+        item.style.border = '4px solid black';
+        selectBtn.style.cursor = 'pointer';
+        buyBtn.disabled = true;
+        buyBtn.innerHTML = 'Owned';
+        buyBtn.style.backgroundColor = 'black';
+        buyBtn.style.cursor = 'default';
+      }
+    });
+    buyBtn.addEventListener('mouseenter', () => {
+      if (!buyBtn.disabled) {
+        buyBtn.style.backgroundColor = '#45a049';
+      }
+    });
+    buyBtn.addEventListener('mouseleave', () => {
+      if (!buyBtn.disabled) {
+        buyBtn.style.backgroundColor = '#4CAF50';
+      }
+    });
+    
+    if (obj.owned) {
+      buyBtn.disabled = true;
+      buyBtn.innerHTML = 'Owned';
+      buyBtn.style.backgroundColor = 'black';
+      buyBtn.style.cursor = 'default';
+    }
+    
+    item.appendChild(title);
+    item.appendChild(previewCanvas);
+    item.appendChild(priceTag);
+    item.appendChild(selectBtn);
+    item.appendChild(buyBtn);
+    
+    // Store type and name for later reference
+    item.dataset.type = type;
+    item.dataset.name = name;
+    
+    shop_items_elements.push(item);
+    return item;
+  }
+  for (let skin in shop_items.player_skins) {
+    shop_items_wrapper.appendChild(createShopItem(skin, 'player_skins', shop_items.player_skins[skin].price));
+  }
+  for (let trail in shop_items.player_trails) {
+    shop_items_wrapper.appendChild(createShopItem(trail, 'player_trails', shop_items.player_trails[trail].price));
   }
 
   //start game
   //load_level(1);
 
   //temporary
+  const trail_spawning_rate = 50;
+  let trail_creation_interval;
   function handleGameFinished() {
     window.requestAnimationFrame(handleGameFinished);
     if (!dynamic_elements.game_active && dynamic_elements.game_completed && active_screen === "game") {
+      you.trails.length = 0;
+      if (trail_creation_interval !== undefined) {
+        clearInterval(trail_creation_interval);
+        trail_creation_interval = undefined;
+      }
+      update_coins(coins + coins_per_game[difficulty]);
       change_screen('menu');
       updateHighscoreText();
       return;
@@ -1035,6 +1422,7 @@
 
   function start_game() {
     if (dynamic_elements.game_active) return;
+    if(trail_creation_interval === undefined) trail_creation_interval = setInterval(() => create_trail(u2), trail_spawning_rate);
     you.correct_spawn_point();
     change_screen('game');
     load_level(1);
@@ -1406,6 +1794,7 @@
     dynamic_elements.current_level = 1;
     enemies.length = 0;
     apples.length = 0;
+    you.trails.length = 0;
     c.clear();
     change_screen("menu");
     paused_cont.style.display = 'none';

@@ -251,3 +251,24 @@ class WarningClock{
 }
 Object.freeze(WarningClock);
 Object.freeze(WarningClock.prototype);
+
+class TrailClock{
+  constructor(living_time, context){
+    this.living_time = living_time;
+    this.timer = performance.now();
+    this.context = context;
+    this.state = 'AWAITING'; // 'AWAITING', 'ACTIVE', 'EXPIRED'
+  }
+  handle_dissapearing(){
+    if(performance.now() > this.timer){
+      this.state = 'EXPIRED';
+      return
+    }
+    requestAnimationFrame(() => {this.handle_dissapearing()});
+  }
+  start(){
+    this.timer = performance.now()+ this.living_time;
+    this.state = 'ACTIVE';
+    requestAnimationFrame(() => {this.handle_dissapearing()});
+  }
+}

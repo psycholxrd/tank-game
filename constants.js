@@ -4,7 +4,7 @@ let difficulty = 'normal';
 /*
 this essentially tweaks some stats based on the selected difficulty
 */
-const difficulty_modifiers = {
+const difficulty_modifiers = Object.freeze({
   'easy': {
     damage: 0.6,
     cooldown: 3.5,
@@ -29,12 +29,18 @@ const difficulty_modifiers = {
     playerHP: 0.95,
     playerDamage: 0.6,
   }
-}
+});
+
+const coins_per_game = Object.freeze({
+  'easy': 4,
+  'normal': 10,
+  'hard': 12,
+});
 
 // --ENEMIES--
 const enemy_knock_damage = 150;
-const boss_types = ["Ice Wizard", "Cry Baby", "Mega Org", "Invincible"];
-const slave_types = ["Frosty", "Crier", "Org"];
+const boss_types = Object.freeze(["Ice Wizard", "Cry Baby", "Mega Org", "Invincible"]);
+const slave_types = Object.freeze(["Frosty", "Crier", "Org"]);
 /*
 EXPLANATION:
 - projectile_directions has 1 for allowed direction and 0 for disallowed. The index represents a direction
@@ -49,7 +55,7 @@ EXPLANATION:
 - frequency how close the waves are to each other
 - amplitude how big are the waves
 */
-const stats = {
+const stats = Object.freeze({
   'Ice Wizard': {
     projectile_directions: [0, 1, 1, 1, 1, 1, 1, 1, 1],
     last_direction: 1,
@@ -154,7 +160,7 @@ const stats = {
     frequency: 1,
     amplitude: 1,
   }
-}
+});
 
 // --PROJECTILES--
 const teleportCoolDownTime = 1500;
@@ -162,9 +168,262 @@ const teleportCoolDownTime = 1500;
 // --APPLES--
 const shrinking_factor = 0.15;
 const min_rFactor_apple = 0.01;
-const calc_new_rFactor = (apple_rFactor) => Math.max(1 - (shrinking_factor * apple_rFactor), min_rFactor_apple);
+const calc_new_rFactor = Object.freeze((apple_rFactor) => Math.max(1 - (shrinking_factor * apple_rFactor), min_rFactor_apple));
 
 // --PLAYER--
+const player_trail_colors = {
+  "None": {
+    outerBody: "",
+    innerBody: "",
+  },
+  "Stone": {
+    outerBody: "DarkSlateGrey",
+    innerBody: "Gray",
+    inner: "Gray",
+    outer: "DarkSlateGrey",
+    part_3: "DimGray",
+    part_4: "rgb(50, 50, 50)",
+  },
+  "Ufo": {
+    outerBody: "Black",
+    innerBody: "lightblue",
+    shine_bright: "White",
+    simple_body_left_inner: "purple",
+    simple_body_right_inner: "purple",
+    window1: "yellow",
+    window2: "yellow",
+    window3: "yellow",
+    window4: "yellow",
+    window5: "yellow",
+    window6: "yellow",
+    bottom_body_left: "MediumOrchid",
+    bottom_body_right: "MediumOrchid",
+    simple_body_left_outer: "violet",
+    simple_body_right_outer: "violet",
+  },
+  "Dirt": {
+    outerBody: "Orange",
+    innerBody: "Maroon",
+    part_1_copy: "Brown",
+    part_1: "Orange",
+    part_2_copy: "Brown",
+    part_2: "Orange",
+    part_3_copy: "Brown",
+    part_3: "Orange",
+    part_4_copy: "Brown",
+    part_4: "Orange",
+  },
+  "Claws": {
+    outerBody: "transparent",
+    innerBody: "transparent",
+    claw_1_inner: "red",
+    claw_1_outer: "black",
+    claw_2_inner: "red",
+    claw_2_outer: "black",
+    claw_3_inner: "red",
+    claw_3_outer: "black",
+  },
+  "XD": {
+    outerBody: "transparent",
+    innerBody: "transparent",
+    X1: "White",
+    X2: "White",
+    D_outer: "White",
+    D_inner: "black",
+  },
+  "Skull": {
+    outerBody: "transparent",
+    innerBody: "transparent",
+    skull_inner: "White",
+    skull_inner_copy: "Black",
+    left_eye_inner1: "black",
+    left_eye_inner2: "White",
+    right_eye_inner1: "black",
+    right_eye_inner2: "White",
+    nose_inner1: "black",
+    nose_inner2: "White",
+  },
+};
+
+const player_skin_colors = {
+  "Default": {
+    outerBody: "darkorange",
+    innerBody: "yellow",
+    damaged: "darkred",
+    frozen: "blue",
+  },
+  "Golem": {
+    outerBody: "DarkSlateGrey",
+    innerBody: "Gray",
+    damaged: "Gainsboro",
+    frozen: "LightSkyBlue",
+    left_eye_inner: "lightblue",
+    right_eye_inner: "lightblue",
+    left_eye_outer: "DarkSlateGrey",
+    left_eye_outer_copy: "DarkSlateGray",
+    lower_mouth_left: "gray",
+    lower_mouth_right: "gray",
+    lower_mouth_outer: "DarkSlateGray",
+    inner_mouth_left: "DarkSlateGray",
+    inner_mouth_right: "DarkSlateGray",
+    left_eye_lid: "DarkSlateGray",
+    left_right_lid: "DarkSlateGray",
+    crack1: "DarkSlateGray",
+    crack2: "DarkSlateGray",
+    crack3: "DarkSlateGray",
+  },
+  "Alien": {
+    outerBody: "Green",
+    innerBody: "MediumAquaMarine",
+    damaged: "MediumSpringGreen",
+    frozen: "MediumTurquoise",
+    left_eye: "black",
+    right_eye: "black",
+    left_nose: "black",
+    right_nose: "black",
+    left_cheek: "MediumSeaGreen",
+    right_cheek: "MediumSeaGreen",
+    mouth: "black",
+    forehead_left: "MediumSeaGreen",
+    forehead_right: "MediumSeaGreen",
+  },
+  "Football": {
+    outerBody: "Gray",
+    innerBody: "White",
+    damaged: "lightgray",
+    frozen: "lightblue",
+    part_1: "black",
+    part_2: "black",
+    part_3: "black",
+    part_4: "black",
+    part_5: "black",
+    part_6: "black",
+    part_7: "black",
+    part_8: "black",
+    part_9: "black",
+    part_10: "black",
+    part_11: "black",
+    part_12: "black",
+    part_14: "black",
+    part_15: "black",
+    part_16: "black",
+    part_17: "black",
+    part_18: "black",
+    part_19: "black",
+    part_20: "black",
+    part_21: "black",
+    part_22: "black",
+  },
+  "Beast": {
+    outerBody: "YellowGreen",
+    innerBody: "Chartreuse",
+    damaged: "Gainsboro",
+    frozen: "LightSkyBlue",
+    left_eye: "White",
+    left_eye_outer: "Red",
+    right_eye: "white",
+    right_eye_outer: "red",
+    left_eyebrow: "YellowGreen",
+    left_eyebrow_outline: "LimeGreen",
+    right_eyebrow: "YellowGreen",
+    right_eyebrow_outline: "LimeGreen",
+    mouth_inner_left: "black",
+    mouth_inner_right: "black",
+    upper_teeth_left: "White",
+    upper_teeth_right: "White",
+    upper_teeth_filler: "White",
+    bottom_teeth_left: "White",
+    bottom_teeth_right: "White",
+    tongue_inner: "Violet",
+    tongue_outer: "Tomato",
+    left_nose: "black",
+    right_nose: "black",
+    left_ear_inner: "Chartreuse",
+    left_ear_outer: "YellowGreen",
+    right_ear_inner: "Chartreuse",
+    right_ear_outer: "YellowGreen",
+    left_ear_inner_drawing: "YellowGreen",
+    right_ear_inner_drawing: "YellowGreen",
+    tongue_inner_drawing: "Tomato",
+  },
+  "trollface": {
+    outerBody: "black",
+    innerBody: "white",
+    damaged: "lightred",
+    frozen: "lightblue",
+    left_cheek_inner: "white",
+    left_cheek_outer: "black",
+    right_cheek_inner: "White",
+    right_cheek_outer: "black",
+    forehead_inner: "White",
+    forehead_outer: "black",
+    jaw_inner: "White",
+    jaw_outer: "black",
+    left_eye1: "black",
+    left_eye2: "White",
+    right_eye1: "black",
+    right_eye2: "White",
+    right_eye3: "White",
+    nose1: "black",
+    nose2: "black",
+    nose3: "black",
+    mouth1: "black",
+    mouth2: "black",
+    mouth3: "black",
+    mouth4: "black",
+    teeth1: "White",
+    teeth2: "White",
+    teeth3: "White",
+    teeth4: "White",
+    teeth5: "White",
+    teeth6: "White",
+    teeth7: "White",
+    teeth8: "White",
+    teeth9: "White",
+    teeth10: "White",
+    teeth11: "White",
+    teeth12: "White",
+    teeth13: "White",
+    teeth14: "White",
+    teeth15: "White",
+    teeth16: "White",
+    chin1: "black",
+    chin2: "black",
+    chin3: "black",
+    nose_line: "black",
+    nose_line2: "black",
+    cheek_line: "black",
+    cheek_line2: "black",
+    cheek_line3: "black",
+    eye_line: "black",
+    eye_line2: "black",
+    eye_line3: "black",
+    eye_line4: "black",
+    eye_line5: "black",
+    forehead_line1: "black",
+    forehead_line2: "black",
+  },
+  "Goth Girl": {
+    outerBody: "red",
+    innerBody: "Maroon",
+    damaged: "Fuchsia",
+    frozen: "MidnightBlue",
+    part_1: "White",
+    part_2: "black",
+    part_3: "black",
+    part_4: "black",
+    part_5: "black",
+    part_6: "darkred",
+    part_8: "black",
+    part_9: "black",
+    part_10: "black",
+    part_12: "gray",
+    part_13: "black",
+    part_14: "black",
+    part_15: "black",
+    part_16: "black",
+  },
+};
 const speed_base = 2.5;
 const starting_HP = 500;
 const starting_rFactor = 0.75;
@@ -173,7 +432,7 @@ const starting_speed = speed_base/starting_rFactor;
 const min_rFactor = 0.4;
 
 // --WEAPONS--
-const weapon_types = ["Laser", "Sniper"];
-const player_projectile_types = ["Snipe"];
+const weapon_types = Object.freeze(["Laser", "Sniper"]);
+const player_projectile_types = Object.freeze(["Snipe"]);
 const laser_min_distance_factor = 125;
 const sniper_damage_multiplier = 4.5;

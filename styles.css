@@ -60,14 +60,107 @@ body {
   background-color: white;
 }
 
+#shop-wrapper {
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+  display: flex;
+  gap: 10px;
+  z-index: 100;
+}
+
+#shop-btn {
+  background-color: var(--color-white);
+  color: var(--color-black);
+  padding: var(--padding-small) var(--padding-standard);
+  border-radius: var(--border-radius-tiny);
+  font-size: var(--font-size-small);
+}
+
+#shop-btn:hover {
+  background-color: lightgray;
+  cursor: pointer;
+}
+
+#coins-display {
+  background-color: var(--color-white);
+  color: var(--color-black);
+  padding: var(--padding-small) var(--padding-standard);
+  border-radius: var(--border-radius-tiny);
+  font-size: var(--font-size-small);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#coin-img {
+  width: 50px;
+  height: 50px;
+};
+
 .container {
   position: relative;
   width: 100%;
   height: 100vh;
 }
 
-#menu-container {
+.shop-big-text {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: var(--font-size-large);
+  color: var(--color-white);
+  text-shadow: 3px 3px 6px var(--color-black);
+  animation-name: menu-big-text-animation;
+  animation-duration: var(--animation-duration-standard);
+}
+
+#shop-container {
+  position: absolute;
+  display: none; /*flex*/
+  top: calc((100% - var(--cont-size))/2);
+  left: calc((100% - var(--cont-size))/2);
+  width: var(--cont-size);
+  height: var(--cont-size);
+  background-color: var(--color-darkslateblue);
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border: var(--border-size-large) solid var(--color-black);
+  border-radius: var(--border-radius-standard);
+}
+
+#shop-items-wrapper {
   position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: var(--margin-medium);
+  width: 90%;
+  height: auto;
+  overflow: auto;
+}
+
+#shop-back-btn {
+  margin-top: var(--margin-large);
+  background-color: var(--btn-inside-before);
+  color: var(--color-white);
+  font-size: var(--font-size-medium);
+  justify-content: center;
+  align-items: center;
+  border: var(--border-size-medium) solid var(--color-darkorange);
+  border-radius: var(--border-radius-standard);
+  transition: all 0.3s ease;
+}
+
+#shop-back-btn:hover {
+  background-color: var(--btn-inside-after);
+  cursor: pointer;
+  border-radius: calc(var(--border-radius-standard) * var(--btn-border-radius-factor));
+  font-size: calc(var(--font-size-medium) * var(--transition-size-factor));
+}
+
+#menu-container {
+  position: absolute;
   display: flex; /*flex*/
   top: calc((100% - var(--cont-size))/2);
   left: calc((100% - var(--cont-size))/2);
@@ -101,7 +194,7 @@ body {
 }
 
 #level-editor-container {
-  position: relative;
+  position: absolute;
   display: none; /*flex*/
   top: calc((100% - var(--cont-size))/2);
   left: calc((100% - var(--cont-size))/2);
@@ -203,7 +296,7 @@ body {
 
 
 #level-selector-container {
-  position: relative;
+  position: absolute;
   display: none; /*flex*/
   top: calc((100% - var(--cont-size))/2);
   left: calc((100% - var(--cont-size))/2);
@@ -355,7 +448,7 @@ body {
 }
 
 #difficulty-container {
-  position: relative;
+  position: absolute;
   display: none; /*flex*/
   top: calc((100% - var(--cont-size))/2);
   left: calc((100% - var(--cont-size))/2);
@@ -553,7 +646,7 @@ body {
 }
 
 #how-to-play-container {
-  position: relative;
+  position: absolute;
   display: none; /*flex*/
   top: calc((100% - var(--cont-size))/2);
   left: calc((100% - var(--cont-size))/2);
