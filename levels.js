@@ -248,6 +248,17 @@ for(let num in default_levels){
   saved? levels[num] = JSON.parse(saved) : deepCloneLevel(default_levels[num], levels[num]);
 }
 
+function msToTime(ms) {
+  const minutes = Math.floor(ms / 60000);
+  const seconds = Math.floor((ms % 60000) / 1000);
+  const milliseconds = Math.floor(ms % 1000);
+
+  const minutesStr = minutes.toString().padStart(2, '0');
+  const secondsStr = seconds.toString().padStart(2, '0');
+  const millisecondsStr = milliseconds.toString().padStart(3, '0');
+  return `${minutesStr}:${secondsStr}:${millisecondsStr}`;
+}
+
 // custom_levels stores the user-edited versions (from localStorage / level editor)
 // We deep-clone so we have an independent copy to restore from
 let custom_levels = {};
