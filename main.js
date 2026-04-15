@@ -1,5 +1,5 @@
 (function() {
- let final_level, level_display, dynamic_elements, apples, enemies, projectiles, player_projectiles, proj_timers, default_levels, levels, load_level, deepCloneLevel;
+ let final_level, level_display, dynamic_elements, apples, enemies, projectiles, player_projectiles, proj_timers, default_levels, levels, custom_levels, load_level, deepCloneLevel, setActiveLevels, refreshCustomLevels;
   function async_a(){
     if(window[bridge_key]){
       const obj = window[bridge_key];
@@ -13,8 +13,11 @@
       proj_timers = obj.proj_timers;
       default_levels = obj.default_levels;
       levels = obj.levels;
+      custom_levels = obj.custom_levels;
       load_level = obj.load_level;
       deepCloneLevel = obj.deepCloneLevel;
+      setActiveLevels = obj.setActiveLevels;
+      refreshCustomLevels = obj.refreshCustomLevels;
       delete window[bridge_key];
     }else{
       setTimeout(async_a, 100);
@@ -92,6 +95,8 @@
   const how_to_play_cont = document.getElementById("how-to-play-container");
   const coins_count = document.getElementById("coin-count");
   const shop_btn = document.getElementById("shop-btn");
+  const mode_cont = document.getElementById("mode-container");
+  const mode_badge = document.getElementById("mode-badge");
 
   const get_spawn_point = () => {
     return {
@@ -105,6 +110,7 @@
   const defaultFPS = 60;
 
   let active_screen = 'menu';
+  let game_mode = 'classic'; // 'classic' or 'custom'
   let weapon_img = new Image();
   let set_weapon_src = () => weapon_img.src = `weapons/${clock.cd.locked.switch_weapon ? 'disabled' : 'enabled'}_${you.selected_weapon}.png`;
   set_weapon_src();
@@ -1056,7 +1062,7 @@
   });
 
   //screen changer
-  const allowed_screens = ['shop', 'menu', 'game', 'difficulty', 'level-selector', 'level-editor', 'how-to-play', 'game-completed'];
+  const allowed_screens = ['shop', 'menu', 'game', 'difficulty', 'level-selector', 'level-editor', 'how-to-play', 'game-completed', 'mode-select'];
   const screen_displays = {
     'shop': 'flex',
     'menu': 'flex',
@@ -1065,7 +1071,8 @@
     'level-selector': 'flex',
     'level-editor': 'flex',
     'how-to-play': 'flex',
-    'game-completed': 'block'
+    'game-completed': 'block',
+    'mode-select': 'flex'
   }
   const screen_containers = {
     'shop': shop_cont,
@@ -1076,6 +1083,7 @@
     'level-editor': level_editor_cont,
     'how-to-play': how_to_play_cont,
     'game-completed': {},
+    'mode-select': mode_cont,
   };
 
   function change_screen(new_screen) {
@@ -1412,7 +1420,9 @@
         clearInterval(trail_creation_interval);
         trail_creation_interval = undefined;
       }
-      update_coins(coins + coins_per_game[difficulty]);
+      if (game_mode === 'classic') {
+        update_coins(coins + coins_per_game[difficulty]);
+      }
       change_screen('menu');
       updateHighscoreText();
       return;
@@ -1422,12 +1432,37 @@
 
   function start_game() {
     if (dynamic_elements.game_active) return;
+    // Swap level source based on game mode
+    if (game_mode === 'classic') {
+      setActiveLevels(default_levels);
+      mode_badge.textContent = 'CLASSIC';
+      mode_badge.classList.remove('custom');
+    } else {
+      refreshCustomLevels();
+      setActiveLevels(custom_levels);
+      mode_badge.textContent = 'CUSTOM';
+      mode_badge.classList.add('custom');
+    }
     if(trail_creation_interval === undefined) trail_creation_interval = setInterval(() => create_trail(u2), trail_spawning_rate);
     you.correct_spawn_point();
     change_screen('game');
     load_level(1);
     spawn_player();
     setTimeout(start_proj_loop, 250);
+  }
+
+  function open_mode_select() {
+    change_screen('mode-select');
+  }
+
+  function select_classic_mode() {
+    game_mode = 'classic';
+    start_game();
+  }
+
+  function select_custom_mode() {
+    game_mode = 'custom';
+    start_game();
   }
 
   function open_difficulties() {
@@ -1914,8 +1949,11 @@
   }
   setInterval(check_level_completion, 0);
 
-  document.getElementById('Start-btn').addEventListener('mousedown', start_game);
+  document.getElementById('Start-btn').addEventListener('mousedown', open_mode_select);
   document.getElementById('Difficulty-btn').addEventListener('mousedown', open_difficulties);
+  document.getElementById('Classic-btn').addEventListener('mousedown', select_classic_mode);
+  document.getElementById('Custom-btn').addEventListener('mousedown', select_custom_mode);
+  document.getElementById('Mode-back-btn').addEventListener('mousedown', () => change_screen('menu'));
   document.getElementById('How-to-Play-btn').addEventListener('mousedown', open_how_to_play);
   document.getElementById('how-to-play-return-btn').addEventListener('mousedown', return_to_menu_from_how_to_play);
   document.getElementById('next-instruction-btn').addEventListener('mousedown', next_instruction);

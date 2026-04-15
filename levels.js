@@ -248,6 +248,36 @@ for(let num in default_levels){
   saved? levels[num] = JSON.parse(saved) : deepCloneLevel(default_levels[num], levels[num]);
 }
 
+// custom_levels stores the user-edited versions (from localStorage / level editor)
+// We deep-clone so we have an independent copy to restore from
+let custom_levels = {};
+for(let num in levels){
+  custom_levels[num] = {
+    apples: [...levels[num].apples.map(a => [...a])],
+    enemies: [...levels[num].enemies.map(e => [...e])],
+  };
+}
+
+function setActiveLevels(source){
+  // Deep-clone source into levels so load_level reads from it
+  for(let num in source){
+    levels[num] = {
+      apples: source[num].apples.map(a => [...a]),
+      enemies: source[num].enemies.map(e => [...e]),
+    };
+  }
+}
+
+function refreshCustomLevels(){
+  // Sync custom_levels from the current levels state (after editor changes)
+  for(let num in levels){
+    custom_levels[num] = {
+      apples: [...levels[num].apples.map(a => [...a])],
+      enemies: [...levels[num].enemies.map(e => [...e])],
+    };
+  }
+}
+
 function load_level(number) {
   if(!dynamic_elements.game_active){
     dynamic_elements.starting_time = performance.now();
@@ -319,7 +349,10 @@ window[bridge_key] = {
   proj_timers,
   default_levels,
   levels,
+  custom_levels,
   load_level,
   deepCloneLevel,
+  setActiveLevels,
+  refreshCustomLevels,
 };
 })();

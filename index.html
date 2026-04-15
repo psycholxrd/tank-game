@@ -34,7 +34,7 @@
       <div id = "menu-container">
         <h1 class = "menu-big-text">Tanks Game (by r!PsAw)</h1>
         <p class = "menu-text" id = "chosen-difficulty">Difficulty: Normal</p>
-        <div class = "menu-btn" id = "Start-btn">Start</div>
+        <div class = "menu-btn" id = "Start-btn">Play</div>
         <div class = "menu-btn" id = "Difficulty-btn">Change Difficulty</div>
         <div class = "menu-btn" id = "Level-Editor-btn">Level Editor</div>
         <div class = "menu-btn" id = "How-to-Play-btn">How to Play</div>
@@ -44,6 +44,7 @@
         <div id = "game-header">
           <div id = "timer">00:00:00</div>
           <div id = "level-display">Level 1</div>
+          <div id = "mode-badge">CLASSIC</div>
           <button id = "pause-btn">||</button>
         </div>
         <canvas id="canvas"></canvas>
@@ -58,6 +59,20 @@
         <div class = "difficulty-btn" id = "Easy-btn"> Easy</div>
         <div class = "difficulty-btn" id = "Normal-btn"> Normal</div>
         <div class = "difficulty-btn" id = "Hard-btn"> Hard</div>
+      </div>
+      <div id = "mode-container">
+        <h1 class = "mode-big-text">Select Mode</h1>
+        <div class = "mode-btn" id = "Classic-btn">
+          <span class = "mode-btn-icon">🏆</span>
+          <span class = "mode-btn-title">Classic</span>
+          <span class = "mode-btn-subtitle">Original levels • Earn coins</span>
+        </div>
+        <div class = "mode-btn" id = "Custom-btn">
+          <span class = "mode-btn-icon">🎨</span>
+          <span class = "mode-btn-title">Custom</span>
+          <span class = "mode-btn-subtitle">Your edited levels • No coins</span>
+        </div>
+        <div class = "mode-btn mode-back-btn" id = "Mode-back-btn">Back</div>
       </div>
       <div id = "level-selector-container">
         <b class = "level-selector-text">Select a level, you want to edit:</b>
