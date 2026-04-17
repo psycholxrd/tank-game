@@ -1106,39 +1106,43 @@ Object.defineProperty(window, "draw_projectile_skin", {
   writable: false,
 });
 
-function draw_warn_signal(projectile) {
-  if (projectile.direction === 0 && projectile.next && projectile.next.x && projectile.next.y && projectile.next.x != projectile.unscaled.x && projectile.next.y != projectile.unscaled.y) {
-    let _x = projectile.next.x;
-    let _y = projectile.next.y;
-    let x = _x * u;
-    let y = _y * u;
-    let state = projectile.flickeringState;
-    c.begin();
-    c.set_property("fillStyle", skin_colors[`Warning${state}`].inside);
-    c.moveTo(x, y - (projectile.r * 2));
-    c.lineTo(x - projectile.r, y);
-    c.lineTo(x + projectile.r, y);
-    c.fill();
+Object.defineProperty(window, "draw_warn_signal", {
+  value: function draw_warn_signal(projectile) {
+    if (projectile.direction === 0 && projectile.next && projectile.next.x && projectile.next.y && projectile.next.x != projectile.unscaled.x && projectile.next.y != projectile.unscaled.y) {
+      let _x = projectile.next.x;
+      let _y = projectile.next.y;
+      let x = _x * u;
+      let y = _y * u;
+      let state = projectile.flickeringState;
+      c.begin();
+      c.set_property("fillStyle", skin_colors[`Warning${state}`].inside);
+      c.moveTo(x, y - (projectile.r * 2));
+      c.lineTo(x - projectile.r, y);
+      c.lineTo(x + projectile.r, y);
+      c.fill();
 
-    c.begin();
-    c.set_property("strokeStyle", skin_colors[`Warning${state}`].outline);
-    c.moveTo(x, y - (projectile.r * 2));
-    c.lineTo(x - projectile.r, y);
-    c.lineTo(x + projectile.r, y);
-    c.ctx.closePath();
-    c.stroke();
+      c.begin();
+      c.set_property("strokeStyle", skin_colors[`Warning${state}`].outline);
+      c.moveTo(x, y - (projectile.r * 2));
+      c.lineTo(x - projectile.r, y);
+      c.lineTo(x + projectile.r, y);
+      c.ctx.closePath();
+      c.stroke();
 
-    c.begin();
-    c.set_property("textAlign", "center");
-    c.set_property("fillStyle", skin_colors[`Warning${state}`].messageFill);
-    c.fillText('!', x, y, projectile.r / 40);
+      c.begin();
+      c.set_property("textAlign", "center");
+      c.set_property("fillStyle", skin_colors[`Warning${state}`].messageFill);
+      c.fillText('!', x, y, projectile.r / 40);
 
-    c.begin();
-    c.set_property("textAlign", "center");
-    c.set_property("strokeStyle", skin_colors[`Warning${state}`].messageStroke);
-    c.strokeText('!', x, y, projectile.r / 40);
-  }
-}
+      c.begin();
+      c.set_property("textAlign", "center");
+      c.set_property("strokeStyle", skin_colors[`Warning${state}`].messageStroke);
+      c.strokeText('!', x, y, projectile.r / 40);
+    }
+  },
+  configurable: false,
+  writable: false,
+});
 
 //PLAYER TRAILS
 Object.defineProperty(window, "draw_player_trail", {

@@ -56,7 +56,7 @@ EXPLANATION:
 - amplitude how big are the waves
 */
 const stats = Object.freeze({
-  'Ice Wizard': {
+  'Ice Wizard': Object.freeze({
     projectile_directions: [0, 1, 1, 1, 1, 1, 1, 1, 1],
     last_direction: 1,
     projectile_type: 'Freeze',
@@ -68,8 +68,8 @@ const stats = Object.freeze({
     isWavy: false,
     frequency: 0,
     amplitude: 0,
-  },
-  'Cry Baby': {
+  }),
+  'Cry Baby': Object.freeze({
     projectile_directions: [0, 0, 0, 0, 1, 0, 1, 0, 0],
     last_direction: 4,
     projectile_type: 'BigTear',
@@ -81,8 +81,8 @@ const stats = Object.freeze({
     isWavy: false,
     frequency: 1,
     amplitude: 1,
-  },
-  'Mega Org': {
+  }),
+  'Mega Org': Object.freeze({
     projectile_directions: [1, 0, 0, 0, 0, 0, 0, 0, 0],
     last_direction: 0,
     projectile_type: 'BigSnipe',
@@ -94,8 +94,8 @@ const stats = Object.freeze({
     isWavy: false,
     frequency: 1,
     amplitude: 1,
-  },
-  'Invincible': {
+  }),
+  'Invincible': Object.freeze({
     projectile_directions: [0, 1, 0, 1, 0, 1, 0, 1, 0],
     last_direction: 0,
     projectile_type: 'Arrow',
@@ -107,8 +107,8 @@ const stats = Object.freeze({
     isWavy: true,
     frequency: 1,
     amplitude: 1,
-  },
-  'Frosty': {
+  }),
+  'Frosty': Object.freeze({
     projectile_directions: [0, 1, 0, 1, 0, 1, 0, 1, 0],
     last_direction: 1,
     projectile_type: 'Arrow',
@@ -120,8 +120,8 @@ const stats = Object.freeze({
     isWavy: false,
     frequency: 1,
     amplitude: 1,
-  },
-  'Crier': {
+  }),
+  'Crier': Object.freeze({
     projectile_directions: [0, 0, 0, 0, 0, 1, 0, 0, 0],
     last_direction: 5,
     projectile_type: 'Tear',
@@ -133,8 +133,8 @@ const stats = Object.freeze({
     isWavy: false,
     frequency: 1,
     amplitude: 1,
-  },
-  'Org': {
+  }),
+  'Org': Object.freeze({
     projectile_directions: [1, 0, 0, 0, 0, 0, 0, 0, 0],
     last_direction: 0,
     projectile_type: 'Snipe',
@@ -146,8 +146,8 @@ const stats = Object.freeze({
     isWavy: false,
     frequency: 1,
     amplitude: 1,
-  },
-  'Default': {
+  }),
+  'Default': Object.freeze({
     projectile_directions: [0, 0, 0, 0, 0, 0, 0, 0, 0],
     last_direction: 0,
     projectile_type: 'Arrow',
@@ -159,7 +159,7 @@ const stats = Object.freeze({
     isWavy: false,
     frequency: 1,
     amplitude: 1,
-  }
+  })
 });
 
 // --PROJECTILES--

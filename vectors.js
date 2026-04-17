@@ -61,3 +61,5 @@ class Vector2D{
         this.end = [sx + (ux*new_len), sy + (uy*new_len)];
     }
 }
+Object.freeze(Vector2D);
+Object.freeze(Vector2D.prototype);

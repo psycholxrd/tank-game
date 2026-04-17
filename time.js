@@ -272,3 +272,5 @@ class TrailClock{
     requestAnimationFrame(() => {this.handle_dissapearing()});
   }
 }
+Object.freeze(TrailClock);
+Object.freeze(TrailClock.prototype);
