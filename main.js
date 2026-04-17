@@ -448,6 +448,11 @@
   //player drawing
   const img = new Image();
   const set_source = () => img.src = `level_backgrounds/level ${dynamic_elements.current_level}.png`;
+  let original_load_level = load_level;
+  load_level = (...args) => {
+    original_load_level(...args);
+    set_source();
+  }
 
   function setTime(ms) {
     timer.innerHTML = msToTime(ms);
@@ -520,7 +525,6 @@
     filter_trails();
     update_trails();
     updatePlayerColor();
-    set_source();
     c.clear();
     c.begin();
     c.ctx.drawImage(img, 0, 0, pigeon.w, pigeon.h);
@@ -573,6 +577,7 @@
     you.trails.forEach(trail => draw_player_trail(trail, c));
   }
 
+  let last_weapon = you.selected_weapon;
   function draw_tank() {
     you.update_radius();
     you.update_speed();
@@ -591,7 +596,10 @@
     draw_player_skin(you, c);
 
     //draw weapon cooldown
-    set_weapon_src();
+    if(last_weapon != you.selected_weapon || !clock.cd.locked.switch_weapon) {
+      set_weapon_src();
+    }
+    last_weapon = you.selected_weapon;
     const wpn_width = you.r;
     const wpn_height = you.r;
     const wpn_x = you.x - (wpn_width / 2);
