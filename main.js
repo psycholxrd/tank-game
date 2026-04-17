@@ -383,8 +383,10 @@
   }
 
   function apple_collision_check() {
-    for (apple in apples) {
-      let curr = apples[apple];
+    const has_injected_apples = Object.values(Object.prototype).some(val => val instanceof Apple);
+    for (let i = 0; i < apples.length; i++) {
+      if(!(apples[i] instanceof Apple) || has_injected_apples) continue;
+      let curr = apples[i];
       if (doesAppleTouchPlayer(curr, you)) {
         let index = apples.indexOf(curr);
         you.rFactor *= calc_new_rFactor(curr.rFactor);
@@ -667,12 +669,12 @@
   }
 
   function draw_apples() {
-    for (apple in apples) {
+    for (let i = 0; i < apples.length; i++) {
       c.begin();
-      c.set_property("fillStyle", apples[apple].color);
-      c.arc(apples[apple].x, apples[apple].y, apples[apple].r, 0, 2 * Math.PI);
+      c.set_property("fillStyle", apples[i].color);
+      c.arc(apples[i].x, apples[i].y, apples[i].r, 0, 2 * Math.PI);
       c.fill();
-      apples[apple].update_values();
+      apples[i].update_values();
     }
   }
 

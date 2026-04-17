@@ -363,6 +363,8 @@ class Projectile {
     this.y = this.unscaled.y * u + wave.x;
   }
 }
+Object.freeze(Projectile);
+Object.freeze(Projectile.prototype);
 
 class PlayerProjectile{
   constructor(type, starting_point, direction_vector, speed, damage, radius){

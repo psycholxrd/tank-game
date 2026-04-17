@@ -5,30 +5,30 @@ let difficulty = 'normal';
 this essentially tweaks some stats based on the selected difficulty
 */
 const difficulty_modifiers = Object.freeze({
-  'easy': {
+  'easy': Object.freeze({
     damage: 0.6,
     cooldown: 3.5,
     projectileSlowness: 3,
     bounceTime: 0.55,
     playerHP: 1.25,
     playerDamage: 3,
-  },
-  'normal': {
+  }),
+  'normal': Object.freeze({
     damage: 1,
     cooldown: 1,
     projectileSlowness: 1,
     bounceTime: 1,
     playerHP: 1,
     playerDamage: 1,
-  },
-  'hard': {
+  }),
+  'hard': Object.freeze({
     damage: 1.25,
     cooldown: 0.7,
     projectileSlowness: 0.6,
     bounceTime: 0.9,
     playerHP: 0.95,
     playerDamage: 0.6,
-  }
+  })
 });
 
 const coins_per_game = Object.freeze({
